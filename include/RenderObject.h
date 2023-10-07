@@ -16,7 +16,7 @@ public:
 
     void rotate(float angle, glm::vec3 axis) {
         angle = glm::radians(angle);
-        this->model_matrix = glm::rotate(this->model_matrix, angle, axis);
+        this->model_matrix = glm::rotate(this->model_matrix, angle, axis); //
     }
 
     void scale(glm::vec3 scale) {
