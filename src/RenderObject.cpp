@@ -1,16 +1,19 @@
 #include "RenderObject.h"
 #include <algorithm>
 
-void RenderObject::translate(glm::vec3 translation) {
+RenderObject *RenderObject::translate(glm::vec3 translation) {
     this->translations.push_back(translation);
+    return this;
 }
 
-void RenderObject::rotate_rad(float angle, glm::vec3 axis) {
+RenderObject *RenderObject::rotate_rad(float angle, glm::vec3 axis) {
     this->rotations.push_back({angle, axis});
+    return this;
 }
 
-void RenderObject::scale(glm::vec3 scale) {
+RenderObject *RenderObject::scale(glm::vec3 scale) {
     this->scales.push_back(scale);
+    return this;
 }
 
 void RenderObject::attach_child(RenderObject *child) {
@@ -26,6 +29,10 @@ void RenderObject::detach_child(RenderObject *child) {
 
 void RenderObject::update_model_matrix() {
     // @TODO rotate and scale children object around its root parent, not own center
+
+    if (this->rotations.empty() && this->translations.empty() && this->scales.empty()) {
+        return;
+    }
 
     auto translate_matrix = glm::mat4(1.0f);
     auto rotate_matrix = glm::mat4(1.0f);

@@ -46,71 +46,57 @@ int main() {
     triangle_2->update_model_matrix();
 
     triangle_1->attach_child(fei_cube_1);
-    fei_cube_1->attach_child(triangle_2);
 
     auto camera = new OrthoCamera(context->get_width(), context->get_height());
 
     float speed = 0.05f;
-    auto input_manager = new InputManager(context->get_window());
-    input_manager->register_key_callback(GLFW_KEY_ESCAPE, [&context]() {
-        context->close();
-    });
-    input_manager->register_key_callback(GLFW_KEY_A, [&triangle_1, speed]() {
+    auto input_manager = new InputManager(context);
+    input_manager->register_key_down_callback(GLFW_KEY_A, [&triangle_1, speed]() {
         triangle_1->translate(glm::vec3(-speed, 0.0f, 0.0f));
-        triangle_1->update_model_matrix();
     });
-    input_manager->register_key_callback(GLFW_KEY_D, [&triangle_1, speed]() {
+    input_manager->register_key_down_callback(GLFW_KEY_D, [&triangle_1, speed]() {
         triangle_1->translate(glm::vec3(speed, 0.0f, 0.0f));
-        triangle_1->update_model_matrix();
     });
-    input_manager->register_key_callback(GLFW_KEY_W, [&triangle_1, speed]() {
+    input_manager->register_key_down_callback(GLFW_KEY_W, [&triangle_1, speed]() {
         triangle_1->translate(glm::vec3(0.0f, speed, 0.0f));
-        triangle_1->update_model_matrix();
     });
-    input_manager->register_key_callback(GLFW_KEY_S, [&triangle_1, speed]() {
+    input_manager->register_key_down_callback(GLFW_KEY_S, [&triangle_1, speed]() {
         triangle_1->translate(glm::vec3(0.0f, -speed, 0.0f));
-        triangle_1->update_model_matrix();
     });
-    input_manager->register_key_callback(GLFW_KEY_I, [&triangle_1, speed]() {
+    input_manager->register_key_down_callback(GLFW_KEY_I, [&triangle_1, speed]() {
         triangle_1->translate(glm::vec3(0.0f, 0.0f, speed));
-        triangle_1->update_model_matrix();
     });
-    input_manager->register_key_callback(GLFW_KEY_O, [&triangle_1, speed]() {
+    input_manager->register_key_down_callback(GLFW_KEY_O, [&triangle_1, speed]() {
         triangle_1->translate(glm::vec3(0.0f, 0.0f, -speed));
-        triangle_1->update_model_matrix();
     });
-    input_manager->register_key_callback(GLFW_KEY_Q, [&triangle_1, speed]() {
+    input_manager->register_key_down_callback(GLFW_KEY_Q, [&triangle_1, speed]() {
         triangle_1->rotate_rad(speed, glm::vec3(0.0f, 0.0f, 1.0f));
-        triangle_1->update_model_matrix();
     });
-    input_manager->register_key_callback(GLFW_KEY_E, [&triangle_1, speed]() {
+    input_manager->register_key_down_callback(GLFW_KEY_E, [&triangle_1, speed]() {
         triangle_1->rotate_rad(-speed, glm::vec3(0.0f, 0.0f, 1.0f));
-        triangle_1->update_model_matrix();
     });
-    input_manager->register_key_callback(GLFW_KEY_X, [&triangle_1, speed]() {
+    input_manager->register_key_down_callback(GLFW_KEY_X, [&triangle_1, speed]() {
         triangle_1->scale(glm::vec3(1.0f - speed, 1.0f - speed, 1.0f - speed));
-        triangle_1->update_model_matrix();
     });
-    input_manager->register_key_callback(GLFW_KEY_C, [&triangle_1, speed]() {
+    input_manager->register_key_down_callback(GLFW_KEY_C, [&triangle_1, speed]() {
         triangle_1->scale(glm::vec3(1.0f + speed, 1.0f + speed, 1.0f + speed));
-        triangle_1->update_model_matrix();
     });
 
-    input_manager->register_key_callback(GLFW_KEY_UP, [&fei_cube_1, speed]() {
+    input_manager->register_key_down_callback(GLFW_KEY_UP, [&fei_cube_1, speed]() {
         fei_cube_1->rotate_rad(speed, glm::vec3(1.0f, 0.0f, 0.0f));
-        fei_cube_1->update_model_matrix();
     });
-    input_manager->register_key_callback(GLFW_KEY_DOWN, [&fei_cube_1, speed]() {
+    input_manager->register_key_down_callback(GLFW_KEY_DOWN, [&fei_cube_1, speed]() {
         fei_cube_1->rotate_rad(-speed, glm::vec3(1.0f, 0.0f, 0.0f));
-        fei_cube_1->update_model_matrix();
     });
-    input_manager->register_key_callback(GLFW_KEY_LEFT, [&fei_cube_1, speed]() {
+    input_manager->register_key_down_callback(GLFW_KEY_LEFT, [&fei_cube_1, speed]() {
         fei_cube_1->rotate_rad(speed, glm::vec3(0.0f, 1.0f, 0.0f));
-        fei_cube_1->update_model_matrix();
     });
-    input_manager->register_key_callback(GLFW_KEY_RIGHT, [&fei_cube_1, speed]() {
+    input_manager->register_key_down_callback(GLFW_KEY_RIGHT, [&fei_cube_1, speed]() {
         fei_cube_1->rotate_rad(-speed, glm::vec3(0.0f, 1.0f, 0.0f));
-        fei_cube_1->update_model_matrix();
+    });
+
+    input_manager->register_key_press_callback(GLFW_KEY_ESCAPE, [&context]() {
+        context->close();
     });
 
 

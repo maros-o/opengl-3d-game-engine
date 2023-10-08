@@ -6,7 +6,8 @@ void Engine::run(OpenGLContext *context, OrthoCamera *camera, InputManager *inpu
         input_manager->update();
 
         Renderer::clear();
-        renderer->render_all_objects(camera);
+        renderer->update_model_matrices();
+        renderer->render_objects(camera);
 
         context->swap_buffers();
     }

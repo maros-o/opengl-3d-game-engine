@@ -22,7 +22,15 @@ void Renderer::add_object(RenderObject *object) {
     }
 }
 
-void Renderer::render_all_objects(OrthoCamera *camera) {
+void Renderer::update_model_matrices() {
+    for (auto &model_group: this->objects) {
+        for (auto &render_object: model_group.second) {
+            render_object->update_model_matrix();
+        }
+    }
+}
+
+void Renderer::render_objects(OrthoCamera *camera) {
     for (auto &model_group: this->objects) {
         auto model = this->models[model_group.first];
 

@@ -14,7 +14,9 @@ public:
 
     void render() const;
 
-    void render_all_objects(OrthoCamera *camera);
+    void render_objects(OrthoCamera *camera);
+
+    void update_model_matrices();
 
     static void clear();
 

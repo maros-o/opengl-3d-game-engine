@@ -77,6 +77,9 @@ OpenGLContext::OpenGLContext(int width, int height, const char *title) {
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
+
+    glDepthFunc(GL_LESS);
+    glEnable(GL_DEPTH_TEST);
 }
 
 OpenGLContext::~OpenGLContext() {
@@ -120,5 +123,6 @@ GLFWwindow *OpenGLContext::get_window() const {
 }
 
 void OpenGLContext::close() {
+    printf("Closing window\n");
     glfwSetWindowShouldClose(this->window, GLFW_TRUE);
 }

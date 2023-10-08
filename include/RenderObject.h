@@ -19,11 +19,11 @@ public:
         return this->model_matrix;
     }
 
-    void translate(glm::vec3 translation);
+    RenderObject *translate(glm::vec3 translation);
 
-    void rotate_rad(float angle, glm::vec3 axis);
+    RenderObject *rotate_rad(float angle, glm::vec3 axis);
 
-    void scale(glm::vec3 scale);
+    RenderObject *scale(glm::vec3 scale);
 
     void attach_child(RenderObject *child);
 
