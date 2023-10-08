@@ -72,8 +72,11 @@ OpenGLContext::OpenGLContext(int width, int height, const char *title) {
     glfwGetFramebufferSize(this->window, &width, &height);
     glViewport(0, 0, width, height);
 
-    glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(message_callback, nullptr);
+    glEnable(GL_DEBUG_OUTPUT);
+
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
 }
 
 OpenGLContext::~OpenGLContext() {

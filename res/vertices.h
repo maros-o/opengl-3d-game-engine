@@ -32,6 +32,20 @@ GLfloat vertices_square_rgb[] = {
         1.0, 1.0, 1.0
 };
 
+GLfloat vertices_square_texture[] = {
+        -0.5, 0.5, 0.0,
+        0.0, 1.0,
+
+        0.5, 0.5, 0.0,
+        1.0, 1.0,
+
+        0.5, -0.5, 0.0,
+        1.0, 0.0,
+
+        -0.5, -0.5, 0.0,
+        0.0, 0.0
+};
+
 GLuint indices_square[] = {
         0, 1, 2,
         2, 3, 0

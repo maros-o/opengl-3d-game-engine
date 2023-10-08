@@ -564,32 +564,32 @@ STBIDEF int stbi_zlib_decode_noheader_buffer(char *obuffer, int olen, const char
  || defined(STBI_ONLY_HDR) || defined(STBI_ONLY_PIC) || defined(STBI_ONLY_PNM) \
  || defined(STBI_ONLY_ZLIB)
                                                                                                                         #ifndef STBI_ONLY_JPEG
-#define STBI_NO_JPEG
-#endif
-#ifndef STBI_ONLY_PNG
-#define STBI_NO_PNG
-#endif
-#ifndef STBI_ONLY_BMP
-#define STBI_NO_BMP
-#endif
-#ifndef STBI_ONLY_PSD
-#define STBI_NO_PSD
-#endif
-#ifndef STBI_ONLY_TGA
-#define STBI_NO_TGA
-#endif
-#ifndef STBI_ONLY_GIF
-#define STBI_NO_GIF
-#endif
-#ifndef STBI_ONLY_HDR
-#define STBI_NO_HDR
-#endif
-#ifndef STBI_ONLY_PIC
-#define STBI_NO_PIC
-#endif
-#ifndef STBI_ONLY_PNM
-#define STBI_NO_PNM
-#endif
+   #define STBI_NO_JPEG
+   #endif
+   #ifndef STBI_ONLY_PNG
+   #define STBI_NO_PNG
+   #endif
+   #ifndef STBI_ONLY_BMP
+   #define STBI_NO_BMP
+   #endif
+   #ifndef STBI_ONLY_PSD
+   #define STBI_NO_PSD
+   #endif
+   #ifndef STBI_ONLY_TGA
+   #define STBI_NO_TGA
+   #endif
+   #ifndef STBI_ONLY_GIF
+   #define STBI_NO_GIF
+   #endif
+   #ifndef STBI_ONLY_HDR
+   #define STBI_NO_HDR
+   #endif
+   #ifndef STBI_ONLY_PIC
+   #define STBI_NO_PIC
+   #endif
+   #ifndef STBI_ONLY_PNM
+   #define STBI_NO_PNM
+   #endif
 #endif
 
 #if defined(STBI_NO_PNG) && !defined(STBI_SUPPORT_ZLIB) && !defined(STBI_NO_ZLIB)
@@ -644,16 +644,16 @@ STBIDEF int stbi_zlib_decode_noheader_buffer(char *obuffer, int olen, const char
 #define STBI_THREAD_LOCAL       thread_local
 #elif defined(__GNUC__) && __GNUC__ < 5
                                                                                                                         #define STBI_THREAD_LOCAL       __thread
-#elif defined(_MSC_VER)
-#define STBI_THREAD_LOCAL       __declspec(thread)
-#elif defined (__STDC_VERSION__) && __STDC_VERSION__ >= 201112L && !defined(__STDC_NO_THREADS__)
-#define STBI_THREAD_LOCAL       _Thread_local
+   #elif defined(_MSC_VER)
+      #define STBI_THREAD_LOCAL       __declspec(thread)
+   #elif defined (__STDC_VERSION__) && __STDC_VERSION__ >= 201112L && !defined(__STDC_NO_THREADS__)
+      #define STBI_THREAD_LOCAL       _Thread_local
 #endif
 
 #ifndef STBI_THREAD_LOCAL
                                                                                                                         #if defined(__GNUC__)
-#define STBI_THREAD_LOCAL       __thread
-#endif
+        #define STBI_THREAD_LOCAL       __thread
+      #endif
 #endif
 #endif
 
@@ -1323,7 +1323,6 @@ static unsigned char *stbi__load_and_postprocess_8bit(stbi__context *s, int *x, 
         ri.bits_per_channel = 8;
     }
 
-
     if (stbi__vertically_flip_on_load) {
         int channels = req_comp ? req_comp : *comp;
         stbi__vertical_flip(result, *x, *y, channels * sizeof(stbi_uc));
@@ -1346,7 +1345,6 @@ static stbi__uint16 *stbi__load_and_postprocess_16bit(stbi__context *s, int *x, 
         result = stbi__convert_8_to_16((stbi_uc *) result, *x, *y, req_comp == 0 ? *comp : req_comp);
         ri.bits_per_channel = 16;
     }
-
 
     if (stbi__vertically_flip_on_load) {
         int channels = req_comp ? req_comp : *comp;
@@ -1377,7 +1375,7 @@ STBI_EXTERN __declspec(dllimport) int __stdcall WideCharToMultiByte(unsigned int
 #if defined(_WIN32) && defined(STBI_WINDOWS_UTF8)
                                                                                                                         STBIDEF int stbi_convert_wchar_to_utf8(char *buffer, size_t bufferlen, const wchar_t* input)
 {
-    return WideCharToMultiByte(65001 /* UTF8 */, 0, input, -1, buffer, (int) bufferlen, NULL, NULL);
+	return WideCharToMultiByte(65001 /* UTF8 */, 0, input, -1, buffer, (int) bufferlen, NULL, NULL);
 }
 #endif
 
@@ -1386,15 +1384,15 @@ static FILE *stbi__fopen(char const *filename, char const *mode) {
 #if defined(_WIN32) && defined(STBI_WINDOWS_UTF8)
                                                                                                                             wchar_t wMode[64];
    wchar_t wFilename[1024];
-    if (0 == MultiByteToWideChar(65001 /* UTF8 */, 0, filename, -1, wFilename, sizeof(wFilename)/sizeof(*wFilename)))
+	if (0 == MultiByteToWideChar(65001 /* UTF8 */, 0, filename, -1, wFilename, sizeof(wFilename)/sizeof(*wFilename)))
       return 0;
 
-    if (0 == MultiByteToWideChar(65001 /* UTF8 */, 0, mode, -1, wMode, sizeof(wMode)/sizeof(*wMode)))
+	if (0 == MultiByteToWideChar(65001 /* UTF8 */, 0, mode, -1, wMode, sizeof(wMode)/sizeof(*wMode)))
       return 0;
 
 #if defined(_MSC_VER) && _MSC_VER >= 1400
-    if (0 != _wfopen_s(&f, wFilename, wMode))
-        f = 0;
+	if (0 != _wfopen_s(&f, wFilename, wMode))
+		f = 0;
 #else
    f = _wfopen(wFilename, wMode);
 #endif
@@ -6131,7 +6129,7 @@ static void *stbi__tga_load(stbi__context *s, int *x, int *y, int *comp, int req
     STBI_NOTUSED(ri);
     STBI_NOTUSED(tga_x_origin);
     STBI_NOTUSED(tga_y_origin);
-
+    
     if (tga_height > STBI_MAX_DIMENSIONS) return stbi__errpuc("too large", "Very large image (corrupt?)");
     if (tga_width > STBI_MAX_DIMENSIONS) return stbi__errpuc("too large", "Very large image (corrupt?)");
 

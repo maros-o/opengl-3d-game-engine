@@ -5,25 +5,27 @@
 
 class Texture {
 public:
-    Texture(const std::string &file_path);
+    Texture(std::string file_path);
 
     ~Texture();
 
     void bind(unsigned int slot = 0) const;
 
-    void unbind() const;
+    static void unbind();
 
-    inline int get_width() const {
+    [[nodiscard]] inline int get_width() const {
         return this->width;
     }
 
-    inline int get_height() const {
+    [[nodiscard]] inline int get_height() const {
         return this->height;
     }
 
+    void destroy();
+
 private:
-    GLuint id = 0;
-    int width = 0, height = 0, bpp = 0;
+    GLuint id;
+    int width, height, channels;
     std::string file_path;
-    GLuint local_buffer = 0;
+    unsigned char *local_buffer;
 };

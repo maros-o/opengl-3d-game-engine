@@ -135,7 +135,7 @@ GLint ShaderProgram::get_uniform_location(const char *name) {
             std::cerr << "ERROR::SHADER::UNIFORM::" << name << "::NOT_FOUND" << std::endl;
             exit(1);
         }
-        this->uniform_locations[name];
+        this->uniform_locations[name] = location;
     }
     return this->uniform_locations[name];
 }
@@ -149,5 +149,11 @@ void ShaderProgram::set_uniform_vec4(const char *name, const glm::vec4 &vector) 
 }
 
 void ShaderProgram::set_uniform_mat4(const char *name, const glm::mat4 &matrix) {
-    glUniformMatrix4fv(this->get_uniform_location(name), 1, GL_FALSE, &matrix[0][0]);
+    GLint location = this->get_uniform_location(name);
+    glUniformMatrix4fv(location, 1, GL_FALSE, &matrix[0][0]);
+}
+
+void ShaderProgram::set_uniform_1i(const char *name, int value) {
+    GLint location = this->get_uniform_location(name);
+    glUniform1i(location, value);
 }

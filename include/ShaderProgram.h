@@ -19,6 +19,8 @@ public:
 
     static void reset();
 
+    void set_uniform_1i(const char *name, int value);
+
     void set_uniform_vec3(const char *name, const glm::vec3 &vector);
 
     void set_uniform_vec4(const char *name, const glm::vec4 &vector);
