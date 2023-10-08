@@ -22,7 +22,3 @@ void EBO::unbind() {
 void EBO::destroy() {
     glDeleteBuffers(1, &this->id);
 }
-
-GLsizei EBO::get_count() const {
-    return this->count;
-}

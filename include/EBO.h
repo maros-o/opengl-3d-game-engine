@@ -12,7 +12,9 @@ public:
 
     static void unbind();
 
-    [[nodiscard]] GLsizei get_count() const;
+    [[nodiscard]] inline GLsizei get_count() const {
+        return this->count;
+    }
 
 private:
     GLuint id = 0;

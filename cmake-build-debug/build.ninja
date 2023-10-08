@@ -119,6 +119,20 @@ build CMakeFiles/cv2.dir/src/Model.cpp.o: CXX_COMPILER__cv2_unscanned_Debug /hom
   OBJECT_DIR = CMakeFiles/cv2.dir
   OBJECT_FILE_DIR = CMakeFiles/cv2.dir/src
 
+build CMakeFiles/cv2.dir/libs/stb/stb_image.cpp.o: CXX_COMPILER__cv2_unscanned_Debug /home/maros/code/vsb/zpg/cv2/libs/stb/stb_image.cpp || cmake_object_order_depends_target_cv2
+  DEP_FILE = CMakeFiles/cv2.dir/libs/stb/stb_image.cpp.o.d
+  FLAGS = -g -fdiagnostics-color=always
+  INCLUDES = -I/home/maros/code/vsb/zpg/cv2/libs -I/home/maros/code/vsb/zpg/cv2/include
+  OBJECT_DIR = CMakeFiles/cv2.dir
+  OBJECT_FILE_DIR = CMakeFiles/cv2.dir/libs/stb
+
+build CMakeFiles/cv2.dir/include/Texture.cpp.o: CXX_COMPILER__cv2_unscanned_Debug /home/maros/code/vsb/zpg/cv2/include/Texture.cpp || cmake_object_order_depends_target_cv2
+  DEP_FILE = CMakeFiles/cv2.dir/include/Texture.cpp.o.d
+  FLAGS = -g -fdiagnostics-color=always
+  INCLUDES = -I/home/maros/code/vsb/zpg/cv2/libs -I/home/maros/code/vsb/zpg/cv2/include
+  OBJECT_DIR = CMakeFiles/cv2.dir
+  OBJECT_FILE_DIR = CMakeFiles/cv2.dir/include
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target cv2
@@ -127,7 +141,7 @@ build CMakeFiles/cv2.dir/src/Model.cpp.o: CXX_COMPILER__cv2_unscanned_Debug /hom
 #############################################
 # Link the executable cv2
 
-build cv2: CXX_EXECUTABLE_LINKER__cv2_Debug CMakeFiles/cv2.dir/src/main.cpp.o CMakeFiles/cv2.dir/src/OpenGLContext.cpp.o CMakeFiles/cv2.dir/src/ShaderProgram.cpp.o CMakeFiles/cv2.dir/src/VAO.cpp.o CMakeFiles/cv2.dir/src/Renderer.cpp.o CMakeFiles/cv2.dir/src/VBO.cpp.o CMakeFiles/cv2.dir/src/RenderObject.cpp.o CMakeFiles/cv2.dir/src/EBO.cpp.o CMakeFiles/cv2.dir/src/Engine.cpp.o CMakeFiles/cv2.dir/src/Model.cpp.o | /usr/lib/x86_64-linux-gnu/libglfw.so.3.3 /usr/lib/x86_64-linux-gnu/libGLEW.so
+build cv2: CXX_EXECUTABLE_LINKER__cv2_Debug CMakeFiles/cv2.dir/src/main.cpp.o CMakeFiles/cv2.dir/src/OpenGLContext.cpp.o CMakeFiles/cv2.dir/src/ShaderProgram.cpp.o CMakeFiles/cv2.dir/src/VAO.cpp.o CMakeFiles/cv2.dir/src/Renderer.cpp.o CMakeFiles/cv2.dir/src/VBO.cpp.o CMakeFiles/cv2.dir/src/RenderObject.cpp.o CMakeFiles/cv2.dir/src/EBO.cpp.o CMakeFiles/cv2.dir/src/Engine.cpp.o CMakeFiles/cv2.dir/src/Model.cpp.o CMakeFiles/cv2.dir/libs/stb/stb_image.cpp.o CMakeFiles/cv2.dir/include/Texture.cpp.o | /usr/lib/x86_64-linux-gnu/libglfw.so.3.3 /usr/lib/x86_64-linux-gnu/libGLEW.so
   FLAGS = -g
   LINK_LIBRARIES = /usr/lib/x86_64-linux-gnu/libglfw.so.3.3  /usr/lib/x86_64-linux-gnu/libGLEW.so  -lGL
   OBJECT_DIR = CMakeFiles/cv2.dir

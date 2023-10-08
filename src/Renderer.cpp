@@ -46,8 +46,13 @@ void Renderer::render_all_objects(float rotation) {
         this->draw_elements_count = model->get_vao()->get_ebo()->get_count();
         this->shader = model->get_shader();
 
+        //auto projection_matrix = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f);
+        //this->shader->set_uniform_mat4("projection_matrix", projection_matrix);
+
         for (auto &render_object: object.second) {
             render_object->rotate(rotation, glm::vec3(1.0f, 1.0f, .5f));
+
+
             Renderer::render(render_object);
         }
     }

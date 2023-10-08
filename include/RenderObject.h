@@ -6,9 +6,13 @@ class RenderObject {
 public:
     explicit RenderObject(Model *model) : model(model) {};
 
-    Model *get_model();
+    inline Model *get_model() {
+        return this->model;
+    }
 
-    glm::mat4 &get_model_matrix();
+    inline glm::mat4 &get_model_matrix() {
+        return this->model_matrix;
+    }
 
     void translate(glm::vec3 translation) {
         this->model_matrix = glm::translate(this->model_matrix, translation);

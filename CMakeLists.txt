@@ -36,6 +36,10 @@ add_executable(cv2 src/main.cpp
         src/Engine.cpp
         res/vertices.h
         src/Model.cpp
+        libs/stb/stb_image.h
+        libs/stb/stb_image.cpp
+        include/Texture.cpp
+        include/Texture.h
 )
 
 # Add header files

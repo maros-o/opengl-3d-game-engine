@@ -7,11 +7,17 @@ class Model {
 public:
     Model(std::string name, VAO *vao, ShaderProgram *shader) : name(std::move(name)), vao(vao), shader(shader) {};
 
-    ShaderProgram *get_shader();
+    inline ShaderProgram *get_shader() {
+        return this->shader;
+    }
 
-    VAO *get_vao();
+    inline VAO *get_vao() {
+        return this->vao;
+    }
 
-    const std::string &get_name();
+    inline const std::string &get_name() {
+        return this->name;
+    }
 
 private:
     std::string name;
