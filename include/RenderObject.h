@@ -31,7 +31,7 @@ public:
 
     void update_model_matrix();
 
-    void update_model_matrix(glm::mat4 parent_matrix, glm::mat4 rotation, glm::mat4 translation, glm::mat4 scale);
+    void update_model_matrix(glm::mat4 root_parent_matrix, glm::mat4 rotation, glm::mat4 translation, glm::mat4 scale);
 
 private:
     Model *model;

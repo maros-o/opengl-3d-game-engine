@@ -25,7 +25,7 @@ void RenderObject::detach_child(RenderObject *child) {
 }
 
 void RenderObject::update_model_matrix() {
-    // @TODO rotate and scale children object around its parent, not own center
+    // @TODO rotate and scale children object around its root parent, not own center
 
     auto translate_matrix = glm::mat4(1.0f);
     auto rotate_matrix = glm::mat4(1.0f);
@@ -60,9 +60,9 @@ void RenderObject::update_model_matrix() {
     }
 }
 
-void RenderObject::update_model_matrix(glm::mat4 parent_matrix, glm::mat4 rotation, glm::mat4 translation,
+void RenderObject::update_model_matrix(glm::mat4 root_parent_matrix, glm::mat4 rotation, glm::mat4 translation,
                                        glm::mat4 scale) {
-    auto parent_position = parent_matrix * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+    //auto parent_position = root_parent_matrix * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
     auto matrix_position = this->model_matrix * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
 
     this->model_matrix = glm::translate(glm::mat4(1.0f), glm::vec3(-matrix_position)) * this->model_matrix;
@@ -75,4 +75,7 @@ void RenderObject::update_model_matrix(glm::mat4 parent_matrix, glm::mat4 rotati
     this->model_matrix = glm::translate(glm::mat4(1.0f), glm::vec3(matrix_position)) * this->model_matrix;
     this->model_matrix = translation * this->model_matrix;
 
+    for (auto &child: this->children) {
+        child->update_model_matrix(this->model_matrix, rotation, translation, scale);
+    }
 }

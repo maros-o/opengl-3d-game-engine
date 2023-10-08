@@ -31,16 +31,22 @@ int main() {
 
 
     auto triangle_1 = new RenderObject{triangle_model};
+    auto triangle_2 = new RenderObject{triangle_model};
     auto fei_cube_1 = new RenderObject{fei_cube_model};
 
     auto renderer = new Renderer();
     renderer->add_object(fei_cube_1);
     renderer->add_object(triangle_1);
+    renderer->add_object(triangle_2);
 
     triangle_1->translate(glm::vec3(1.f, 0.0f, 0.0f));
     triangle_1->update_model_matrix();
 
+    triangle_2->translate(glm::vec3(-1.f, 0.0f, 0.0f));
+    triangle_2->update_model_matrix();
+
     triangle_1->attach_child(fei_cube_1);
+    fei_cube_1->attach_child(triangle_2);
 
     auto camera = new OrthoCamera(context->get_width(), context->get_height());
 
