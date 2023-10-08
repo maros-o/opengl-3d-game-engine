@@ -5,9 +5,9 @@
 
 #include "OpenGLContext.h"
 
-class OrthographicCamera {
+class OrthoCamera {
 public:
-    explicit OrthographicCamera(int width, int height);
+    explicit OrthoCamera(int width, int height);
 
     [[nodiscard]] glm::mat4 get_view_projection_matrix() const;
 

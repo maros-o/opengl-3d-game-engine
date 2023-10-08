@@ -92,10 +92,6 @@ void OpenGLContext::swap_buffers() {
     glfwSwapBuffers(this->window);
 }
 
-void OpenGLContext::poll_events() {
-    glfwPollEvents();
-}
-
 void OpenGLContext::print_version_info() {
     printf("OpenGL Version: %s\n", glGetString(GL_VERSION));
     printf("Using GLEW %s\n", glewGetString(GLEW_VERSION));
@@ -117,4 +113,12 @@ int OpenGLContext::get_height() const {
     int height;
     glfwGetWindowSize(this->window, nullptr, &height);
     return height;
+}
+
+GLFWwindow *OpenGLContext::get_window() const {
+    return this->window;
+}
+
+void OpenGLContext::close() {
+    glfwSetWindowShouldClose(this->window, GLFW_TRUE);
 }

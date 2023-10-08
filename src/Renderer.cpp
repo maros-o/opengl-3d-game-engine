@@ -22,7 +22,7 @@ void Renderer::add_object(RenderObject *object) {
     }
 }
 
-void Renderer::render_all_objects(OrthographicCamera *camera) {
+void Renderer::render_all_objects(OrthoCamera *camera) {
     for (auto &model_group: this->objects) {
         auto model = this->models[model_group.first];
 
@@ -37,8 +37,6 @@ void Renderer::render_all_objects(OrthographicCamera *camera) {
         }
 
         for (auto &render_object: model_group.second) {
-            render_object->rotate(0.1, glm::vec3(1.f, 1.f, 1.f));
-
             auto mvp_matrix = camera->get_view_projection_matrix() * render_object->get_model_matrix();
             this->shader->set_uniform_mat4f("uni_MVP_matrix", mvp_matrix);
 

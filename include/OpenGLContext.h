@@ -15,13 +15,15 @@ public:
 
     void swap_buffers();
 
-    static void print_version_info();
+    void close();
 
-    static void poll_events();
+    static void print_version_info();
 
     [[nodiscard]] int get_width() const;
 
     [[nodiscard]] int get_height() const;
+
+    [[nodiscard]] GLFWwindow *get_window() const;
 
 private:
     GLFWwindow *window;

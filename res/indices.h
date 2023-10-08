@@ -2,16 +2,16 @@
 
 #include "OpenGLContext.h"
 
-GLuint indices_triangle[] = {
+std::vector<GLuint> indices_triangle = {
         0, 1, 2
 };
 
-GLuint indices_square[] = {
+std::vector<GLuint> indices_square = {
         0, 1, 2,
         2, 3, 0
 };
 
-GLuint indices_cube[] = {
+std::vector<GLuint> indices_cube = {
         // front
         0, 1, 2,
         2, 3, 0,

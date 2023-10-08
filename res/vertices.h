@@ -2,7 +2,7 @@
 
 #include "OpenGLContext.h"
 
-GLfloat vertices_triangle_rgb[] = {
+std::vector<GLfloat> vertices_triangle_rgb = {
         0.0f, 0.2f, 0.0f,
         1.0f, 0.0f, 0.0f,
 
@@ -13,7 +13,7 @@ GLfloat vertices_triangle_rgb[] = {
         0.0f, 0.0f, 1.0f
 };
 
-GLfloat vertices_square_rgb[] = {
+std::vector<GLfloat> vertices_square_rgb = {
         -0.5, 0.5, 0.0,
         1.0, 1.0, 0.0,
 
@@ -27,7 +27,7 @@ GLfloat vertices_square_rgb[] = {
         1.0, 1.0, 1.0
 };
 
-GLfloat vertices_square_texture[] = {
+std::vector<GLfloat> vertices_square_texture = {
         -0.5, 0.5, 0.0,
         0.0, 1.0,
 
@@ -41,7 +41,7 @@ GLfloat vertices_square_texture[] = {
         0.0, 0.0
 };
 
-GLfloat vertices_cube[] = {
+std::vector<GLfloat> vertices_cube = {
         // front
         -0.5, 0.5, 0.5,     // 0 left top front
         0.5, 0.5, 0.5,      // 1 right top front
@@ -55,7 +55,7 @@ GLfloat vertices_cube[] = {
         -0.5, -0.5, -0.5, // 7 left bottom back
 };
 
-GLfloat vertices_cube_rgb[] = {
+std::vector<GLfloat> vertices_cube_rgb = {
         // front
         -0.5, 0.5, 0.5,     // 0 left top front
         1.0, 0.0, 0.0,
@@ -83,7 +83,7 @@ GLfloat vertices_cube_rgb[] = {
         0.0, 0.0, 0.0,
 };
 
-GLfloat vertices_cube_texture[] = {
+std::vector<GLfloat> vertices_cube_texture = {
         // front
         -0.5, 0.5, 0.5,     // 0 left top front
         0.0, 1.0,

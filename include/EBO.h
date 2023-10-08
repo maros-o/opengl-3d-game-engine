@@ -1,10 +1,11 @@
 #pragma once
 
 #include <GL/glew.h>
+#include <vector>
 
 class EBO {
 public:
-    EBO(GLuint *indices, GLsizeiptr size);
+    explicit EBO(const std::vector<GLuint> &indices);
 
     ~EBO();
 

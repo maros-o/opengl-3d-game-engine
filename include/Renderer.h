@@ -4,7 +4,7 @@
 #include <unordered_map>
 
 #include "RenderObject.h"
-#include "OrthographicCamera.h"
+#include "OrthoCamera.h"
 
 class Renderer {
 public:
@@ -14,7 +14,7 @@ public:
 
     void render() const;
 
-    void render_all_objects(OrthographicCamera *camera);
+    void render_all_objects(OrthoCamera *camera);
 
     static void clear();
 

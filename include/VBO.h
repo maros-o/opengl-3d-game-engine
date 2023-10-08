@@ -2,10 +2,11 @@
 
 #include "OpenGLContext.h"
 #include <iostream>
+#include <vector>
 
 class VBO {
 public:
-    VBO(GLfloat *vertices, GLsizeiptr size);
+    explicit VBO(const std::vector<GLfloat> &vertices);
 
     ~VBO();
 
