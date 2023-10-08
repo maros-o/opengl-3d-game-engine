@@ -66,9 +66,9 @@ void RenderObject::update_model_matrix(glm::mat4 parent_matrix, glm::mat4 rotati
     auto matrix_position = this->model_matrix * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
 
     this->model_matrix = glm::translate(glm::mat4(1.0f), glm::vec3(-matrix_position)) * this->model_matrix;
-    //  this->model_matrix = glm::translate(glm::mat4(1.0f), glm::vec3(-parent_position)) * this->model_matrix;
+    //this->model_matrix = glm::translate(glm::mat4(1.0f), glm::vec3(parent_position)) * this->model_matrix;
     this->model_matrix = rotation * this->model_matrix;
-    //this->model_matrix = glm::translate(glm::mat4(1.0f), glm::vec3(+parent_position)) * this->model_matrix;
+    //this->model_matrix = glm::translate(glm::mat4(1.0f), glm::vec3(-parent_position)) * this->model_matrix;
 
     this->model_matrix = scale * this->model_matrix;
 
