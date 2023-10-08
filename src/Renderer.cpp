@@ -30,7 +30,6 @@ void Renderer::update_model_matrices() {
     }
 }
 
-//
 void Renderer::render_objects(OrthoCamera *camera) {
     for (auto &model_group: this->objects) {
         auto model = this->models[model_group.first];
