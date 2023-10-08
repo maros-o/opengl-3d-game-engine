@@ -1,8 +1,9 @@
 #pragma once
 
 #include "Renderer.h"
+#include "OrthographicCamera.h"
 
 class Engine {
 public:
-    static void run(OpenGLContext *context, Renderer *renderer);
+    static void run(OpenGLContext *context, OrthographicCamera *camera, Renderer *renderer);
 };

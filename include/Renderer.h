@@ -4,6 +4,7 @@
 #include <unordered_map>
 
 #include "RenderObject.h"
+#include "OrthographicCamera.h"
 
 class Renderer {
 public:
@@ -15,7 +16,7 @@ public:
 
     void render_all_objects();
 
-    void render_all_objects(float rotation);
+    void render_all_objects(OrthographicCamera *camera, float rotation);
 
     static void clear();
 

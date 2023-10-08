@@ -1,13 +1,13 @@
 #include "Engine.h"
 
-void Engine::run(OpenGLContext *context, Renderer *renderer) {
+void Engine::run(OpenGLContext *context, OrthographicCamera *camera, Renderer *renderer) {
     float rotation = 0.0f;
     float rotation_speed = 0.001f;
     while (!context->should_close()) {
         OpenGLContext::poll_events();
 
         Renderer::clear();
-        renderer->render_all_objects(rotation);
+        renderer->render_all_objects(camera, rotation);
 
         context->swap_buffers();
 

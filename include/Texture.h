@@ -5,7 +5,7 @@
 
 class Texture {
 public:
-    Texture(std::string file_path);
+    explicit Texture(std::string file_path);
 
     ~Texture();
 

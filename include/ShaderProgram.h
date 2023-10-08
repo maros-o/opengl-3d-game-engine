@@ -21,11 +21,11 @@ public:
 
     void set_uniform_1i(const char *name, int value);
 
-    void set_uniform_vec3(const char *name, const glm::vec3 &vector);
+    void set_uniform_vec3f(const char *name, const glm::vec3 &vector);
 
-    void set_uniform_vec4(const char *name, const glm::vec4 &vector);
+    void set_uniform_vec4f(const char *name, const glm::vec4 &vector);
 
-    void set_uniform_mat4(const char *name, const glm::mat4 &matrix);
+    void set_uniform_mat4f(const char *name, const glm::mat4 &matrix);
 
     void print_active_uniforms() const;
 

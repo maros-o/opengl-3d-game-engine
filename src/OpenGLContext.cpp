@@ -106,3 +106,15 @@ void OpenGLContext::print_version_info() {
     glfwGetVersion(&major, &minor, &revision);
     printf("Using GLFW %i.%i.%i\n", major, minor, revision);
 }
+
+int OpenGLContext::get_width() const {
+    int width;
+    glfwGetWindowSize(this->window, &width, nullptr);
+    return width;
+}
+
+int OpenGLContext::get_height() const {
+    int height;
+    glfwGetWindowSize(this->window, nullptr, &height);
+    return height;
+}

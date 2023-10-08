@@ -19,6 +19,10 @@ public:
 
     static void poll_events();
 
+    [[nodiscard]] int get_width() const;
+
+    [[nodiscard]] int get_height() const;
+
 private:
     GLFWwindow *window;
 };

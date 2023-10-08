@@ -37,7 +37,7 @@ void Renderer::render_all_objects() {
     }
 }
 
-void Renderer::render_all_objects(float rotation) {
+void Renderer::render_all_objects(OrthographicCamera *camera, float rotation) {
     for (auto &model_group: this->objects) {
         auto model = this->models[model_group.first];
 
@@ -46,17 +46,16 @@ void Renderer::render_all_objects(float rotation) {
         this->draw_elements_count = model->get_vao()->get_ebo()->get_count();
         this->shader = model->get_shader();
 
-        //auto projection_matrix = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f);
-        //this->shader->set_uniform_mat4("projection_matrix", projection_matrix);
-
+        if (model->get_texture() != nullptr) {
+            model->get_texture()->bind();
+            this->shader->set_uniform_1i("uni_texture_sampler", 0);
+        }
 
         for (auto &render_object: model_group.second) {
             render_object->rotate(rotation, glm::vec3(1.0f, 1.0f, .5f));
-            this->shader->set_uniform_mat4("model_matrix", render_object->get_model_matrix());
 
-            auto texture = new Texture("../res/textures/fei.png");
-            texture->bind();
-            this->shader->set_uniform_1i("texture_sampler", 0);
+            auto mvp_matrix = camera->get_view_projection_matrix() * render_object->get_model_matrix();
+            this->shader->set_uniform_mat4f("uni_MVP_matrix", mvp_matrix);
 
             Renderer::render(render_object);
         }
