@@ -45,7 +45,7 @@ int main() {
     //renderer->add_object(cube_object);
     renderer->add_object(square_object);
 
-    auto camera = new OrthographicCamera(context);
+    auto camera = new OrthographicCamera(context->get_width(), context->get_height());
 
     Engine::run(context, camera, renderer);
 }

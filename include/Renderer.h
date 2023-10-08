@@ -12,11 +12,9 @@ public:
 
     void add_object(RenderObject *object);
 
-    void render(RenderObject *object) const;
+    void render() const;
 
-    void render_all_objects();
-
-    void render_all_objects(OrthographicCamera *camera, float rotation);
+    void render_all_objects(OrthographicCamera *camera);
 
     static void clear();
 

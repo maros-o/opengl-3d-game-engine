@@ -7,14 +7,9 @@
 
 class OrthographicCamera {
 public:
-    explicit OrthographicCamera(OpenGLContext *context);
+    explicit OrthographicCamera(int width, int height);
 
     [[nodiscard]] glm::mat4 get_view_projection_matrix() const;
-
-    void translate(glm::vec3 translation);
-
-    void rotate(float angle, glm::vec3 axis);
-
 
 private:
     glm::mat4 projection_matrix{glm::mat4(1.0f)};

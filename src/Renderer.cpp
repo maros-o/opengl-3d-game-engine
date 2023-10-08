@@ -7,7 +7,7 @@ void Renderer::clear() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void Renderer::render(RenderObject *object) const {
+void Renderer::render() const {
     glDrawElements(GL_TRIANGLES, this->draw_elements_count, GL_UNSIGNED_INT, nullptr);
 }
 
@@ -22,22 +22,7 @@ void Renderer::add_object(RenderObject *object) {
     }
 }
 
-void Renderer::render_all_objects() {
-    for (auto &object: this->objects) {
-        auto model = this->models[object.first];
-
-        model->get_shader()->use();
-        model->get_vao()->bind();
-        this->draw_elements_count = model->get_vao()->get_ebo()->get_count();
-        this->shader = model->get_shader();
-
-        for (auto &render_object: object.second) {
-            Renderer::render(render_object);
-        }
-    }
-}
-
-void Renderer::render_all_objects(OrthographicCamera *camera, float rotation) {
+void Renderer::render_all_objects(OrthographicCamera *camera) {
     for (auto &model_group: this->objects) {
         auto model = this->models[model_group.first];
 
@@ -52,12 +37,12 @@ void Renderer::render_all_objects(OrthographicCamera *camera, float rotation) {
         }
 
         for (auto &render_object: model_group.second) {
-            render_object->rotate(rotation, glm::vec3(1.0f, 1.0f, .5f));
+            render_object->rotate(0.1, glm::vec3(1.f, 1.f, 1.f));
 
             auto mvp_matrix = camera->get_view_projection_matrix() * render_object->get_model_matrix();
             this->shader->set_uniform_mat4f("uni_MVP_matrix", mvp_matrix);
 
-            Renderer::render(render_object);
+            this->render();
         }
     }
 }
