@@ -1,4 +1,0 @@
-composite pattern
-model_matrix
-renderer:run loop
-drawable object propojuje model s shaderem, model ma v sobe vao

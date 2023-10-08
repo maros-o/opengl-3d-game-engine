@@ -1,3 +1,0 @@
-/home/maros/code/vsb/zpg/cv2/cmake-build-debug/CMakeFiles/cv2.dir
-/home/maros/code/vsb/zpg/cv2/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/maros/code/vsb/zpg/cv2/cmake-build-debug/CMakeFiles/rebuild_cache.dir
