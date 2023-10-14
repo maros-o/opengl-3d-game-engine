@@ -32,7 +32,7 @@ public:
 
     void rotate(unsigned short mouse_x, unsigned short mouse_y);
 
-    void subscribe(CameraObserver *observer);//
+    void subscribe(CameraObserver *observer);
 
     void unsubscribe(CameraObserver *observer);
 
