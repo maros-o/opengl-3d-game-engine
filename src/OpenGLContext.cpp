@@ -126,3 +126,7 @@ void OpenGLContext::close() {
     printf("Closing window\n");
     glfwSetWindowShouldClose(this->window, GLFW_TRUE);
 }
+
+void OpenGLContext::set_viewport(unsigned short width, unsigned short height) {
+    glViewport(0, 0, width, height);
+}

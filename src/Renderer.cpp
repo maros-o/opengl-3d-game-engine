@@ -22,7 +22,7 @@ void Renderer::add_object(RenderObject *object) {
     }
 }
 
-void Renderer::render_objects(Camera *camera) {
+void Renderer::render_objects() {
     for (auto &model_group: this->objects) {
         auto model = this->models[model_group.first];
 
@@ -35,9 +35,6 @@ void Renderer::render_objects(Camera *camera) {
             model->get_texture()->bind();
             this->shader->set_uniform_1i("uni_texture_sampler", 0);
         }
-
-        this->shader->set_uniform_mat4f("uni_projection_matrix", camera->get_projection_matrix());
-        this->shader->set_uniform_mat4f("uni_view_matrix", camera->get_view_matrix());
 
         for (auto &render_object: model_group.second) {
             this->shader->set_uniform_mat4f("uni_model_matrix", render_object->get_model_matrix());

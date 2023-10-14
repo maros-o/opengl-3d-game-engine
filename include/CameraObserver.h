@@ -2,5 +2,7 @@
 
 class CameraObserver {
 public:
-    virtual void update() = 0;
+    virtual void view_matrix_changed() = 0;
+
+    virtual void projection_matrix_changed() = 0;
 };

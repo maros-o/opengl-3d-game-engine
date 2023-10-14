@@ -15,8 +15,8 @@ int main() {
 
     auto camera = new Camera(context->get_width(), context->get_height());
 
-    auto shader_program_rgb = new ShaderProgram{"../res/shaders/rgb.shader", camera};
     auto shader_program_texture = new ShaderProgram{"../res/shaders/texture.shader", camera};
+    auto shader_program_rgb = new ShaderProgram{"../res/shaders/rgb.shader", camera};
 
 
     auto vao_triangle = new VAO{new VBO{vertices_triangle_rgb},
@@ -37,6 +37,7 @@ int main() {
     auto triangle_1 = new RenderObject{triangle_model};
     auto triangle_2 = new RenderObject{triangle_model};
     auto fei_cube_1 = new RenderObject{fei_cube_model};
+    auto fei_cube_2 = new RenderObject{fei_cube_model};
 
     auto transformable_root = new TransformableComposite({triangle_1, triangle_2, fei_cube_1});
 
@@ -44,6 +45,7 @@ int main() {
     renderer->add_object(fei_cube_1);
     renderer->add_object(triangle_1);
     renderer->add_object(triangle_2);
+    renderer->add_object(fei_cube_2);
 
     triangle_1->translate(glm::vec3(1.f, 0.0f, 0.0f));
     triangle_1->update_model_matrix();
@@ -51,58 +53,54 @@ int main() {
     triangle_2->translate(glm::vec3(-1.f, 0.0f, 0.0f));
     triangle_2->update_model_matrix();
 
-    float speed = 0.05f;
-    auto input_manager = new InputManager(context);
-    input_manager->register_key_down_callback(GLFW_KEY_A, [&transformable_root, speed]() {
-        transformable_root->rotate(speed, glm::vec3(0.0f, 0.0f, 1.0f));
-        transformable_root->rotate(speed, glm::vec3(0.0f, 1.0f, 0.0f));
-        transformable_root->rotate(speed, glm::vec3(1.0f, 0.0f, 0.0f));
+    fei_cube_1->translate(glm::vec3(0.0f, 0.0f, -3.0f));
+    fei_cube_1->update_model_matrix();
+
+    InputManager &input_manager = InputManager::get_instance();
+    input_manager.init();
+
+    input_manager.register_key_down_callback(GLFW_KEY_W, [&camera]() {
+        camera->move(CameraMovement::FORWARD);
+        printf("key down: W\n");
     });
-    input_manager->register_key_down_callback(GLFW_KEY_D, [&triangle_1, speed]() {
-        triangle_1->translate(glm::vec3(speed, 0.0f, 0.0f));
+    input_manager.register_key_down_callback(GLFW_KEY_S, [&camera]() {
+        camera->move(CameraMovement::BACKWARD);
+        printf("key down: S\n");
     });
-    input_manager->register_key_down_callback(GLFW_KEY_W, [&triangle_1, speed]() {
-        triangle_1->translate(glm::vec3(0.0f, speed, 0.0f));
+    input_manager.register_key_down_callback(GLFW_KEY_A, [&camera]() {
+        camera->move(CameraMovement::LEFT);
+        printf("key down: A\n");
     });
-    input_manager->register_key_down_callback(GLFW_KEY_S, [&triangle_1, speed]() {
-        triangle_1->translate(glm::vec3(0.0f, -speed, 0.0f));
+    input_manager.register_key_down_callback(GLFW_KEY_D, [&camera]() {
+        camera->move(CameraMovement::RIGHT);
+        printf("key down: D\n");
     });
-    input_manager->register_key_down_callback(GLFW_KEY_I, [&triangle_1, speed]() {
-        triangle_1->translate(glm::vec3(0.0f, 0.0f, speed));
+    input_manager.register_key_down_callback(GLFW_KEY_SPACE, [&camera]() {
+        camera->move(CameraMovement::UP);
+        printf("key down: SPACE\n");
     });
-    input_manager->register_key_down_callback(GLFW_KEY_O, [&triangle_1, speed]() {
-        triangle_1->translate(glm::vec3(0.0f, 0.0f, -speed));
-    });
-    input_manager->register_key_down_callback(GLFW_KEY_Q, [&triangle_1, speed]() {
-        triangle_1->rotate(speed, glm::vec3(0.0f, 0.0f, 1.0f));
-    });
-    input_manager->register_key_down_callback(GLFW_KEY_E, [&triangle_1, speed]() {
-        triangle_1->rotate(-speed, glm::vec3(0.0f, 0.0f, 1.0f));
-    });
-    input_manager->register_key_down_callback(GLFW_KEY_X, [&triangle_1, speed]() {
-        triangle_1->scale(glm::vec3(1.0f - speed, 1.0f - speed, 1.0f - speed));
-    });
-    input_manager->register_key_down_callback(GLFW_KEY_C, [&triangle_1, speed]() {
-        triangle_1->scale(glm::vec3(1.0f + speed, 1.0f + speed, 1.0f + speed));
+    input_manager.register_key_down_callback(GLFW_KEY_LEFT_CONTROL, [&camera]() {
+        camera->move(CameraMovement::DOWN);
+        printf("key down: LEFT_CONTROL\n");
     });
 
-    input_manager->register_key_down_callback(GLFW_KEY_UP, [&fei_cube_1, speed]() {
-        fei_cube_1->rotate(speed, glm::vec3(1.0f, 0.0f, 0.0f));
-    });
-    input_manager->register_key_down_callback(GLFW_KEY_DOWN, [&fei_cube_1, speed]() {
-        fei_cube_1->rotate(-speed, glm::vec3(1.0f, 0.0f, 0.0f));
-    });
-    input_manager->register_key_down_callback(GLFW_KEY_LEFT, [&fei_cube_1, speed]() {
-        fei_cube_1->rotate(speed, glm::vec3(0.0f, 1.0f, 0.0f));
-    });
-    input_manager->register_key_down_callback(GLFW_KEY_RIGHT, [&fei_cube_1, speed]() {
-        fei_cube_1->rotate(-speed, glm::vec3(0.0f, 1.0f, 0.0f));
+    input_manager.register_cursor_position_callback(
+            [&camera, &context](unsigned short pos_x, unsigned short pos_y) {
+                printf("mouse moved: (%d, %d)\n", pos_x, pos_y);
+                camera->rotate(pos_x, pos_y);
+                InputManager::set_cursor_position(context->get_width() / 2, context->get_height() / 2);
+            });
+
+    input_manager.register_window_resize_callback([&camera](unsigned short width, unsigned short height) {
+        printf("window resized: (%d, %d)\n", width, height);
+        camera->window_resize(width, height);
+        OpenGLContext::set_viewport(width, height);
     });
 
-    input_manager->register_key_press_callback(GLFW_KEY_ESCAPE, [&context]() {
+    input_manager.register_key_press_callback(GLFW_KEY_ESCAPE, [&context]() {
         context->close();
     });
 
 
-    Engine::run(context, camera, input_manager, renderer, transformable_root);
+    Engine::run(context, renderer, transformable_root);
 }

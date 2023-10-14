@@ -59,9 +59,7 @@ static unsigned int compile_shader(GLuint type, const char *source) {
     return shader;
 }
 
-ShaderProgram::ShaderProgram(const char *shader_file_path, Camera *camera) : camera(camera) {
-    this->camera->subscribe(this);
-
+ShaderProgram::ShaderProgram(const char *shader_file_path, Camera *camera) {
     ShaderProgramSource source = parse_shader(shader_file_path);
 
     GLuint vertex_shader = compile_shader(GL_VERTEX_SHADER, source.vertex_source);
@@ -92,6 +90,8 @@ ShaderProgram::ShaderProgram(const char *shader_file_path, Camera *camera) : cam
 
     glDeleteShader(fragment_shader);
     glDeleteShader(vertex_shader);
+
+    this->set_camera(camera);
 }
 
 ShaderProgram::~ShaderProgram() {
@@ -161,12 +161,24 @@ void ShaderProgram::set_uniform_1i(const char *name, int value) {
 }
 
 void ShaderProgram::set_camera(Camera *new_cam) {
-    this->camera->unsubscribe(this);
-
+    if (this->camera != nullptr) {
+        this->camera->unsubscribe(this);
+    }
     this->camera = new_cam;
     this->camera->subscribe(this);
+
+    this->use();
+    this->set_uniform_mat4f("uni_projection_matrix", this->camera->get_projection_matrix());
+    this->set_uniform_mat4f("uni_view_matrix", this->camera->get_view_matrix());
+    ShaderProgram::reset();
 }
 
-void ShaderProgram::update() {
+void ShaderProgram::view_matrix_changed() {
+    this->use();
     this->set_uniform_mat4f("uni_view_matrix", this->camera->get_view_matrix());
+}
+
+void ShaderProgram::projection_matrix_changed() {
+    this->use();
+    this->set_uniform_mat4f("uni_projection_matrix", this->camera->get_projection_matrix());
 }

@@ -13,7 +13,7 @@ public:
 
     void render() const;
 
-    void render_objects(Camera *camera);
+    void render_objects();
 
     static void clear();
 

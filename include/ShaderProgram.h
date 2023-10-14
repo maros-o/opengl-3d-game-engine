@@ -33,13 +33,15 @@ public:
 
     void set_camera(Camera *camera);
 
-    void update() final;
+    void view_matrix_changed() final;
+
+    void projection_matrix_changed() final;
 
 private:
     GLuint id = 0;
     std::unordered_map<const char *, GLint> uniform_locations;
 
-    Camera *camera;
+    Camera *camera = nullptr;
 
     void destroy() const;
 

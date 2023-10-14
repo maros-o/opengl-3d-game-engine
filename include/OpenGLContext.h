@@ -17,6 +17,8 @@ public:
 
     void close();
 
+    static void set_viewport(unsigned short width, unsigned short height);
+
     static void print_version_info();
 
     [[nodiscard]] int get_width() const;
