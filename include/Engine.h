@@ -1,10 +1,11 @@
 #pragma once
 
 #include "Renderer.h"
-#include "OrthoCamera.h"
 #include "InputManager.h"
+#include "TransformableComposite.h"
 
 class Engine {
 public:
-    static void run(OpenGLContext *context, OrthoCamera *camera, InputManager *input_manager, Renderer *renderer);
+    static void run(OpenGLContext *context, Camera *camera, InputManager *input_manager, Renderer *renderer,
+                    TransformableComposite *transformable_root);
 };

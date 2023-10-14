@@ -2,8 +2,7 @@
 
 #include <../libs/stb/stb_image.h>
 
-Texture::Texture(std::string file_path) : file_path(std::move(file_path)), local_buffer(nullptr), width(0), height(0),
-                                          channels(0), id(0) {
+Texture::Texture(std::string file_path) : file_path(std::move(file_path)) {
 
     stbi_set_flip_vertically_on_load(1);
     this->local_buffer = stbi_load(this->file_path.c_str(), &this->width, &this->height, &this->channels, 4);
@@ -22,6 +21,8 @@ Texture::Texture(std::string file_path) : file_path(std::move(file_path)), local
 
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, this->width, this->height, 0, GL_RGBA, GL_UNSIGNED_BYTE,
                  this->local_buffer);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    
     Texture::unbind();
 
     if (this->local_buffer) {

@@ -6,6 +6,8 @@
 
 class VAO {
 public:
+    explicit VAO(VBO *vbo);
+
     VAO(VBO *vbo, EBO *ebo);
 
     ~VAO();
@@ -18,16 +20,18 @@ public:
 
     static void unbind();
 
-    [[nodiscard]] VBO *get_vbo() const;
+    [[nodiscard]] const VBO *get_vbo() const;
 
-    [[nodiscard]] EBO *get_ebo() const;
+    [[nodiscard]] const EBO *get_ebo() const;
+
+    [[nodiscard]] bool has_ebo() const;
 
 
 private:
     GLuint id = 0;
 
-    VBO *vbo = nullptr;
-    EBO *ebo = nullptr;
+    const VBO *vbo = nullptr;
+    const EBO *ebo = nullptr;
 
     void destroy();
 };

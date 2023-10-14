@@ -4,7 +4,6 @@
 #include <unordered_map>
 
 #include "RenderObject.h"
-#include "OrthoCamera.h"
 
 class Renderer {
 public:
@@ -14,9 +13,7 @@ public:
 
     void render() const;
 
-    void render_objects(OrthoCamera *camera);
-
-    void update_model_matrices();
+    void render_objects(Camera *camera);
 
     static void clear();
 

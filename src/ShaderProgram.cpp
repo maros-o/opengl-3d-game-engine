@@ -59,7 +59,9 @@ static unsigned int compile_shader(GLuint type, const char *source) {
     return shader;
 }
 
-ShaderProgram::ShaderProgram(const char *shader_file_path) {
+ShaderProgram::ShaderProgram(const char *shader_file_path, Camera *camera) : camera(camera) {
+    this->camera->subscribe(this);
+
     ShaderProgramSource source = parse_shader(shader_file_path);
 
     GLuint vertex_shader = compile_shader(GL_VERTEX_SHADER, source.vertex_source);
@@ -156,4 +158,15 @@ void ShaderProgram::set_uniform_mat4f(const char *name, const glm::mat4 &matrix)
 void ShaderProgram::set_uniform_1i(const char *name, int value) {
     GLint location = this->get_uniform_location(name);
     glUniform1i(location, value);
+}
+
+void ShaderProgram::set_camera(Camera *new_cam) {
+    this->camera->unsubscribe(this);
+
+    this->camera = new_cam;
+    this->camera->subscribe(this);
+}
+
+void ShaderProgram::update() {
+    this->set_uniform_mat4f("uni_view_matrix", this->camera->get_view_matrix());
 }

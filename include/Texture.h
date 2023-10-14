@@ -24,8 +24,8 @@ public:
     void destroy();
 
 private:
-    GLuint id;
-    int width, height, channels;
+    GLuint id = 0;
+    int width = 0, height = 0, channels = 0;
     std::string file_path;
-    unsigned char *local_buffer;
+    unsigned char *local_buffer = nullptr;
 };

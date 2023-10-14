@@ -2,16 +2,18 @@
 
 #include <GL/glew.h>
 #include <iostream>
-#include <glm/vec3.hpp> // glm::vec3
-#include <glm/vec4.hpp> // glm::vec4
-#include <glm/mat4x4.hpp> // glm::mat4
-#include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
-#include <glm/gtc/type_ptr.hpp> // glm::value_ptr
+#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
+#include <glm/mat4x4.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <unordered_map>
+#include "CameraObserver.h"
+#include "Camera.h"
 
-class ShaderProgram {
+class ShaderProgram : public CameraObserver {
 public:
-    explicit ShaderProgram(const char *shader_file_path);
+    ShaderProgram(const char *shader_file_path, Camera *camera);
 
     ~ShaderProgram();
 
@@ -29,9 +31,15 @@ public:
 
     void print_active_uniforms() const;
 
+    void set_camera(Camera *camera);
+
+    void update() final;
+
 private:
     GLuint id = 0;
     std::unordered_map<const char *, GLint> uniform_locations;
+
+    Camera *camera;
 
     void destroy() const;
 
