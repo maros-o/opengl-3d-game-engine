@@ -15,7 +15,7 @@ public:
     }
 
     inline const std::vector<unsigned int> &get_indices() const {
-        return this->indices;
+        return this->indices;//
     }
 
     inline const std::vector<float> &get_normals() const {
