@@ -25,5 +25,5 @@ private:
 
     std::vector<glm::vec3> translations;
     std::vector<Rotation> rotations;
-    std::vector<glm::vec3> scales;
+    std::vector<glm::vec3> scales;//
 };
