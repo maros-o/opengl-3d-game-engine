@@ -1,59 +1,96 @@
 #include "RenderObject.h"
 #include <algorithm>
 
-void RenderObject::update_model_matrix() {
-    if (this->rotations.empty() && this->translations.empty() && this->scales.empty()) {
-        return;
-    }
-
-    auto translate_matrix = glm::mat4(1.0f);
-    auto rotate_matrix = glm::mat4(1.0f);
-    auto scale_matrix = glm::mat4(1.0f);
-
-    for (auto &translation: this->translations) {
-        translate_matrix = glm::translate(translate_matrix, translation);
-    }
-
-    for (auto &rotation: this->rotations) {
-        rotate_matrix = glm::rotate(rotate_matrix, rotation.angle, rotation.axis);
-    }
-
-    for (auto &scale: this->scales) {
-        scale_matrix = glm::scale(scale_matrix, scale);
-    }
-    this->translations.clear();
-    this->rotations.clear();
-    this->scales.clear();
-
-    auto matrix_position = this->model_matrix * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-    this->model_matrix = glm::translate(glm::mat4(1.0f), glm::vec3(-matrix_position)) * this->model_matrix;
-    this->model_matrix = rotate_matrix * this->model_matrix;
-
-    this->model_matrix = scale_matrix * this->model_matrix;
-
-    this->model_matrix = glm::translate(glm::mat4(1.0f), glm::vec3(matrix_position)) * this->model_matrix;
-    this->model_matrix = translate_matrix * this->model_matrix;
+Model *RenderObject::get_model() {
+    return this->model;
 }
 
-Transformable *RenderObject::translate(glm::vec3 translation) {
-    this->translations.push_back(translation);
+Transformable *RenderObject::scale(float scale) {
+    this->measure *= scale;
+    this->model_matrix_changed = true;
     return this;
 }
 
-Transformable *RenderObject::rotate(float angle, glm::vec3 axis) {
-    this->rotations.push_back({angle, axis});
+Transformable *RenderObject::rotate(glm::vec3 axis) {
+    this->rotation += axis;
+    this->clamp_rotation();
+    this->model_matrix_changed = true;
+    return this;
+}
+
+Transformable *RenderObject::translate(glm::vec3 translation) {
+    this->position += translation;
+    this->model_matrix_changed = true;
     return this;
 }
 
 Transformable *RenderObject::scale(glm::vec3 scale) {
-    this->scales.push_back(scale);
+    this->measure *= scale;
+    this->model_matrix_changed = true;
     return this;
 }
 
-const glm::mat4 &RenderObject::get_model_matrix() {
+Transformable *RenderObject::set_position(glm::vec3 new_position) {
+    this->position = new_position;
+    this->model_matrix_changed = true;
+    return this;
+}
+
+Transformable *RenderObject::set_rotation(glm::vec3 new_rotation) {
+    this->rotation = new_rotation;
+    this->clamp_rotation();
+    this->model_matrix_changed = true;
+    return this;
+}
+
+Transformable *RenderObject::set_scale(glm::vec3 new_scale) {
+    this->measure = new_scale;
+    this->model_matrix_changed = true;
+    return this;
+}
+
+glm::mat4 RenderObject::get_model_matrix() {
+    if (this->model_matrix_changed) {
+        this->model_matrix = glm::mat4(1.0f);
+        this->model_matrix = glm::translate(this->model_matrix, this->position);
+        this->model_matrix = glm::rotate(this->model_matrix, glm::radians(this->rotation.x),
+                                         glm::vec3(1.0f, 0.0f, 0.0f));
+        this->model_matrix = glm::rotate(this->model_matrix, glm::radians(this->rotation.y),
+                                         glm::vec3(0.0f, 1.0f, 0.0f));
+        this->model_matrix = glm::rotate(this->model_matrix, glm::radians(this->rotation.z),
+                                         glm::vec3(0.0f, 0.0f, 1.0f));
+        this->model_matrix = glm::scale(this->model_matrix, this->measure);
+
+        this->model_matrix_changed = false;
+    }
+
+    if (this->parent != nullptr) {
+        return glm::mat4{this->parent->get_model_matrix() * this->model_matrix};
+    }
     return this->model_matrix;
 }
 
-Model *RenderObject::get_model() {
-    return this->model;
+void RenderObject::set_parent(RenderObject *new_parent) {
+    if (new_parent == this) {
+        fprintf(stderr, "RenderObject::set_parent: new_parent == this\n");
+        exit(1);
+    }
+    if (new_parent->get_parent() == this) {
+        fprintf(stderr, "RenderObject::set_parent: new_parent->get_parent() == this\n");
+        exit(1);
+    }
+    this->parent = new_parent;
+}
+
+void RenderObject::clamp_rotation() {
+    if (this->rotation.x > 360.0f) this->rotation.x -= 360.0f;
+    if (this->rotation.y > 360.0f) this->rotation.y -= 360.0f;
+    if (this->rotation.z > 360.0f) this->rotation.z -= 360.0f;
+    if (this->rotation.x < 0.0f) this->rotation.x += 360.0f;
+    if (this->rotation.y < 0.0f) this->rotation.y += 360.0f;
+    if (this->rotation.z < 0.0f) this->rotation.z += 360.0f;
+}
+
+RenderObject *RenderObject::get_parent() {
+    return this->parent;
 }

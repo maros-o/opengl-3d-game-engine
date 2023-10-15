@@ -1,29 +1,45 @@
 #pragma once
 
 #include "Transformable.h"
+#include "Model.h"
 
-class RenderObject : public Transformable {
+class RenderObject : Transformable {
 public:
     explicit RenderObject(Model *model) : model(model) {};
 
     Model *get_model();
 
-    const glm::mat4 &get_model_matrix();
+    glm::mat4 get_model_matrix();
 
-    Transformable *translate(glm::vec3 translation) override;
+    void set_parent(RenderObject *parent);
 
-    Transformable *rotate(float angle, glm::vec3 axis) override;
+    RenderObject *get_parent();
 
-    Transformable *scale(glm::vec3 scale) override;
+    Transformable *translate(glm::vec3 translation) final;
 
-    void update_model_matrix() override;
+    Transformable *rotate(glm::vec3 axis) final;
+
+    Transformable *scale(glm::vec3 scale) final;
+
+    Transformable *scale(float scale) final;
+
+    Transformable *set_position(glm::vec3 new_position) final;
+
+    Transformable *set_rotation(glm::vec3 new_rotation) final;
+
+    Transformable *set_scale(glm::vec3 new_scale) final;
 
 
 private:
     Model *model;
     glm::mat4 model_matrix = glm::mat4(1.0f);
+    bool model_matrix_changed = false;
 
-    std::vector<glm::vec3> translations;
-    std::vector<Rotation> rotations;
-    std::vector<glm::vec3> scales;//
+    RenderObject *parent = nullptr;
+
+    glm::vec3 position{glm::vec3(0.0f, 0.0f, 3.0f)};
+    glm::vec3 rotation{glm::vec3(0.0f, 0.0f, 0.0f)};
+    glm::vec3 measure{glm::vec3(1.0f, 1.0f, 1.0f)};
+
+    void clamp_rotation();
 };

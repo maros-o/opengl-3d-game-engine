@@ -6,6 +6,5 @@
 
 class Engine {
 public:
-    static void run(OpenGLContext *context, Renderer *renderer,
-                    TransformableComposite *transformable_root);
+    static void run(OpenGLContext *context, Renderer *renderer);
 };

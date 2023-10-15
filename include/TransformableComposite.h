@@ -1,5 +1,6 @@
 #pragma once
 
+#include <vector>
 #include "Transformable.h"
 
 class TransformableComposite : public Transformable {
@@ -8,21 +9,24 @@ public:
 
     explicit TransformableComposite(std::vector<Transformable *> children) : children(std::move(children)) {};
 
-    Transformable *translate(glm::vec3 translation) override;
+    Transformable *translate(glm::vec3 translation) final;
 
-    Transformable *rotate(float angle, glm::vec3 axis) override;
+    Transformable *rotate(glm::vec3 axis) final;
 
-    Transformable *scale(glm::vec3 scale) override;
+    Transformable *scale(glm::vec3 scale) final;
+
+    Transformable *scale(float scale) final;
+
+    Transformable *set_position(glm::vec3 new_position) final;
+
+    Transformable *set_rotation(glm::vec3 new_rotation) final;
+
+    Transformable *set_scale(glm::vec3 new_scale) final;
 
     void attach_child(Transformable *child);
 
     void detach_child(Transformable *child);
 
-    void update_model_matrix() override;
-
 private:
     std::vector<Transformable *> children;
-    std::vector<glm::vec3> translations;
-    std::vector<Rotation> rotations;
-    std::vector<glm::vec3> scales;
 };

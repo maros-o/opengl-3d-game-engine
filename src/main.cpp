@@ -58,8 +58,7 @@ int main() {
     auto fei_cube_2 = new RenderObject{fei_cube_model};
     auto suzi_1 = new RenderObject(suzi_model);
     auto sphere_1 = new RenderObject(sphere_model);
-
-    auto transformable_root = new TransformableComposite({triangle_1, triangle_2, fei_cube_1});
+    fei_cube_1->set_parent(suzi_1);
 
     auto renderer = new Renderer();
     renderer->add_object(fei_cube_1);
@@ -70,19 +69,10 @@ int main() {
     renderer->add_object(sphere_1);
 
     triangle_1->translate(glm::vec3(1.f, 0.0f, 0.0f));
-    triangle_1->update_model_matrix();
-
     triangle_2->translate(glm::vec3(-1.f, 0.0f, 0.0f));
-    triangle_2->update_model_matrix();
-
-    fei_cube_1->translate(glm::vec3(0.0f, 0.0f, -3.0f));
-    fei_cube_1->update_model_matrix();
-
+    fei_cube_1->scale(3);
     suzi_1->translate(glm::vec3(0.0f, 2.0f, 0.0f))->scale(glm::vec3(0.5f, 0.5f, 0.5f));
-    suzi_1->update_model_matrix();
-
     sphere_1->translate(glm::vec3(0.0f, -2.0f, 0.0f));
-    sphere_1->update_model_matrix();
 
     InputManager &input_manager = InputManager::get_instance();
     input_manager.init();
@@ -112,6 +102,26 @@ int main() {
         printf("key down: LEFT_CONTROL\n");
     });
 
+    input_manager.register_key_down_callback(GLFW_KEY_UP, [&suzi_1]() {
+        suzi_1->rotate(glm::vec3(3.0f, 0.0f, 0.0f));
+    });
+    input_manager.register_key_down_callback(GLFW_KEY_DOWN, [&suzi_1]() {
+        suzi_1->rotate(glm::vec3(-3.0f, 0.0f, 0.0f));
+    });
+    input_manager.register_key_down_callback(GLFW_KEY_LEFT, [&suzi_1]() {
+        suzi_1->rotate(glm::vec3(0.0f, 3.0f, 0.0f));
+    });
+    input_manager.register_key_down_callback(GLFW_KEY_RIGHT, [&suzi_1]() {
+        suzi_1->rotate(glm::vec3(0.0f, -3.0f, 0.0f));
+    });
+    input_manager.register_key_down_callback(GLFW_KEY_4, [&suzi_1]() {
+        suzi_1->translate(glm::vec3(0.0f, 0.0f, -0.1f));
+    });
+    input_manager.register_key_down_callback(GLFW_KEY_5, [&suzi_1]() {
+        suzi_1->translate(glm::vec3(0.0f, 0.0f, 0.1f));
+    });
+
+
     input_manager.register_cursor_position_callback(
             [&camera, &context](unsigned short pos_x, unsigned short pos_y) {
                 printf("mouse moved: (%d, %d)\n", pos_x, pos_y);
@@ -128,5 +138,5 @@ int main() {
     });
 
 
-    Engine::run(context, renderer, transformable_root);
+    Engine::run(context, renderer);
 }
