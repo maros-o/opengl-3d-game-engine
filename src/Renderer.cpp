@@ -7,10 +7,6 @@ void Renderer::clear() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void Renderer::render() const {
-    glDrawElements(GL_TRIANGLES, this->draw_elements_count, GL_UNSIGNED_INT, nullptr);
-}
-
 void Renderer::add_object(RenderObject *object) {
     auto model_name = object->get_model()->get_name();
 
@@ -28,8 +24,11 @@ void Renderer::render_objects() {
 
         model->get_shader()->use();
         model->get_vao()->bind();
-        this->draw_elements_count = model->get_vao()->get_ebo()->get_count();
+
+        this->draw_count = model->get_vao()->has_ebo() ? model->get_vao()->get_ebo()->get_indices_count()
+                                                       : model->get_vao()->get_vbo()->get_vertex_count();
         this->shader = model->get_shader();
+
 
         if (model->get_texture() != nullptr) {
             model->get_texture()->bind();
@@ -38,7 +37,12 @@ void Renderer::render_objects() {
 
         for (auto &render_object: model_group.second) {
             this->shader->set_uniform_mat4f("uni_model_matrix", render_object->get_model_matrix());
-            this->render();
+
+            if (model->get_vao()->has_ebo()) {
+                glDrawElements(GL_TRIANGLES, this->draw_count, GL_UNSIGNED_INT, nullptr);
+            } else {
+                glDrawArrays(GL_TRIANGLES, 0, this->draw_count);
+            }
         }
     }
 }

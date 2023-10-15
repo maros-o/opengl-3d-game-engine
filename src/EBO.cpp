@@ -1,10 +1,12 @@
 #include "EBO.h"
 
 EBO::EBO(const std::vector<GLuint> &indices) {
-    this->count = indices.size();
+    this->indices_count = static_cast<GLsizei>(indices.size());
+    
     glGenBuffers(1, &this->id);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->id);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLfloat), indices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<GLsizei>(indices.size() * sizeof(GLfloat)), indices.data(),
+                 GL_STATIC_DRAW);
 }
 
 EBO::~EBO() {

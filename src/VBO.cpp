@@ -1,9 +1,12 @@
 #include "VBO.h"
 
-VBO::VBO(const std::vector<GLfloat> &vertices) {
+VBO::VBO(const std::vector<GLfloat> &vertices, GLsizei values_per_vertex) {
+    this->vertex_count = static_cast<GLsizei>(vertices.size()) / values_per_vertex;
+    
     glGenBuffers(1, &this->id);
     glBindBuffer(GL_ARRAY_BUFFER, this->id);
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(GLfloat), vertices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizei>(vertices.size() * sizeof(GLfloat)), vertices.data(),
+                 GL_STATIC_DRAW);
 }
 
 VBO::~VBO() {

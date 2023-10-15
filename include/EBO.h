@@ -13,13 +13,13 @@ public:
 
     static void unbind();
 
-    [[nodiscard]] inline GLsizei get_count() const {
-        return this->count;
+    [[nodiscard]] inline GLsizei get_indices_count() const {
+        return this->indices_count;
     }
 
 private:
     GLuint id = 0;
-    GLsizei count = 0;
+    GLsizei indices_count = 0;
 
     void destroy();
 };

@@ -6,7 +6,7 @@
 
 class VBO {
 public:
-    explicit VBO(const std::vector<GLfloat> &vertices);
+    VBO(const std::vector<GLfloat> &vertices, GLsizei values_per_vertex);
 
     ~VBO();
 
@@ -14,8 +14,13 @@ public:
 
     static void unbind();
 
+    [[nodiscard]] inline GLsizei get_vertex_count() const {
+        return this->vertex_count;
+    }
+
 private:
     GLuint id = 0;
+    GLsizei vertex_count = 0;
 
     void destroy();
 };

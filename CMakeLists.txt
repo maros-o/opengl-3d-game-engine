@@ -47,6 +47,10 @@ add_executable(proj src/main.cpp
         src/Camera.cpp
         include/CameraObserver.h
         include/Mesh.h
+        res/3d_models/plain.h
+        res/3d_models/sphere.h
+        res/3d_models/suzi_flat.h
+        res/3d_models/suzi_smooth.h
 )
 
 target_include_directories(proj PUBLIC include)
