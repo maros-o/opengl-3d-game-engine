@@ -15,8 +15,6 @@ RenderObject *RenderObjectLeaf::attach(RenderObject *child) {
     composite->set_rotation(this->rotation);
     composite->set_scale(this->measure);
 
-    delete this;
-
     return composite;
 }
 

@@ -80,8 +80,7 @@ int main() {
     RenderObject *bushes_1 = new RenderObjectLeaf(bushes_model);
     RenderObject *tree_1 = new RenderObjectLeaf(tree_model);
 
-    suzi_1 = suzi_1->attach(fei_cube_1);
-    suzi_1 = suzi_1->attach(sphere_1);
+    suzi_1 = suzi_1->attach(fei_cube_1)->attach(sphere_1);
     fei_cube_1 = fei_cube_1->attach(gift_1);
 
     auto renderer = new Renderer();
