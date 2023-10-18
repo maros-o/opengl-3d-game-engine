@@ -11,7 +11,7 @@ class InputManager {
 public:
     static InputManager &get_instance();
 
-    void init();
+    InputManager &init();
 
     void register_key_press_callback(int key, const std::function<void()> &callback);
 

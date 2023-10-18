@@ -173,12 +173,17 @@ void ShaderProgram::set_camera(Camera *new_cam) {
     ShaderProgram::reset();
 }
 
-void ShaderProgram::view_matrix_changed() {
+void ShaderProgram::update(int event_type) {
     this->use();
-    this->set_uniform_mat4f("uni_view_matrix", this->camera->get_view_matrix());
-}
 
-void ShaderProgram::projection_matrix_changed() {
-    this->use();
-    this->set_uniform_mat4f("uni_projection_matrix", this->camera->get_projection_matrix());
+    if (event_type == (int) CameraEvent::VIEW) {
+        this->set_uniform_mat4f("uni_view_matrix", this->camera->get_view_matrix());
+        return;
+    }
+    if (event_type == (int) CameraEvent::PROJECTION) {
+        this->set_uniform_mat4f("uni_projection_matrix", this->camera->get_projection_matrix());
+        return;
+    }
+
+    throw std::runtime_error("Unknown event type");
 }

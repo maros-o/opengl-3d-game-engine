@@ -3,7 +3,10 @@
 #include <vector>
 #include <unordered_map>
 
-#include "RenderObject.h"
+#include "RenderObject/RenderObject.h"
+#include "RenderObject/RenderObjectLeaf.h"
+#include "RenderObject/RenderObjectComposite.h"
+
 
 class Renderer {
 public:
@@ -13,13 +16,15 @@ public:
 
     void render_objects();
 
+    void render() const;
+
     static void clear();
 
 private:
     std::unordered_map<std::string, std::vector<RenderObject *>> objects;
     std::unordered_map<std::string, Model *> models;
 
-    GLsizei draw_count = 0;
-
-    ShaderProgram *shader = nullptr;
+    GLsizei current_draw_count = 0;
+    ShaderProgram *current_shader = nullptr;
+    bool current_vao_has_ebo = false;
 };

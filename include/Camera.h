@@ -1,15 +1,22 @@
 #pragma once
 
 #include <glm/glm.hpp>
-#include "CameraObserver.h"
 #include <vector>
 #include <functional>
+
+#include "reusable_design_patterns/Observer/IObserver.h"
+#include "reusable_design_patterns/Observer/IObservable.h"
 
 const float POV = 60.0f;
 const float SPEED = 0.1f;
 const float SENSITIVITY = 50.0f;
 const float NEAR = 0.1f;
 const float FAR = 100.0f;
+
+enum class CameraEvent {
+    PROJECTION = 0,
+    VIEW = 1
+};
 
 enum class CameraMovement {
     FORWARD,
@@ -20,7 +27,7 @@ enum class CameraMovement {
     DOWN
 };
 
-class Camera {
+class Camera : IObservable {
 public:
     explicit Camera(int width, int height);
 
@@ -32,9 +39,9 @@ public:
 
     void rotate(unsigned short mouse_x, unsigned short mouse_y);
 
-    void subscribe(CameraObserver *observer);
+    void subscribe(IObserver *observer) override;
 
-    void unsubscribe(CameraObserver *observer);
+    void unsubscribe(IObserver *observer) override;
 
     void window_resize(int new_width, int new_height);
 
@@ -53,9 +60,7 @@ private:
     float pitch = 0.0f;
     float yaw = -90.0f;
 
-    std::vector<CameraObserver *> observers;
+    std::vector<IObserver *> observers;
 
-    void notify_view_matrix_change();
-
-    void notify_projection_matrix_change();
+    void notify(int event_type) override;
 };

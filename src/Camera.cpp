@@ -35,7 +35,8 @@ void Camera::move(CameraMovement direction) {
             this->position -= this->speed * this->up;
             break;
     }
-    this->notify_view_matrix_change();
+
+    this->notify((int) CameraEvent::VIEW);
 }
 
 void Camera::rotate(unsigned short mouse_x, unsigned short mouse_y) {
@@ -64,31 +65,26 @@ void Camera::rotate(unsigned short mouse_x, unsigned short mouse_y) {
     this->right = glm::normalize(glm::cross(this->front, this->world_up));
     this->up = glm::normalize(glm::cross(this->right, this->front));
 
-    this->notify_view_matrix_change();
+    this->notify((int) CameraEvent::VIEW);
 }
 
 void Camera::window_resize(int new_width, int new_height) {
     this->width = new_width;
     this->height = new_height;
-    this->notify_projection_matrix_change();
+
+    this->notify((int) CameraEvent::PROJECTION);
 }
 
-void Camera::subscribe(CameraObserver *observer) {
+void Camera::subscribe(IObserver *observer) {
     this->observers.push_back(observer);
 }
 
-void Camera::unsubscribe(CameraObserver *observer) {
+void Camera::unsubscribe(IObserver *observer) {
     this->observers.erase(std::remove(this->observers.begin(), this->observers.end(), observer), this->observers.end());
 }
 
-void Camera::notify_view_matrix_change() {
+void Camera::notify(int event_type) {
     for (auto &observer: this->observers) {
-        observer->view_matrix_changed();
-    }
-}
-
-void Camera::notify_projection_matrix_change() {
-    for (auto &observer: this->observers) {
-        observer->projection_matrix_changed();
+        observer->update(event_type);
     }
 }

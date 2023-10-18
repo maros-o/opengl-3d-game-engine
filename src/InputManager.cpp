@@ -3,7 +3,7 @@
 
 InputManager InputManager::instance;
 
-void InputManager::init() {
+InputManager &InputManager::init() {
     auto window = glfwGetCurrentContext();
 
     glfwSetWindowUserPointer(window, this);
@@ -51,6 +51,8 @@ void InputManager::init() {
             callback(width, height);
         }
     });
+
+    return *this;
 }
 
 void InputManager::update() {

@@ -22,12 +22,12 @@ add_executable(proj src/main.cpp
         src/ShaderProgram.cpp
         src/VAO.cpp
         src/Renderer.cpp
-        include/RenderObject.h
-        include/VBO.h
+        include/RenderObject/RenderObject.h
+        include/buffers/VBO.h
         src/VBO.cpp
         include/Renderer.h
         src/RenderObject.cpp
-        include/EBO.h
+        include/buffers/EBO.h
         src/EBO.cpp
         include/Model.h
         include/InputManager.h
@@ -40,17 +40,22 @@ add_executable(proj src/main.cpp
         include/Texture.h
         res/indices.h
         src/InputManager.cpp
-        include/Transformable.h
-        include/TransformableComposite.h
-        src/TransformableComposite.cpp
         include/Camera.h
         src/Camera.cpp
-        include/CameraObserver.h
         include/Mesh.h
         res/3d_models/plain.h
         res/3d_models/sphere.h
         res/3d_models/suzi_flat.h
         res/3d_models/suzi_smooth.h
+        include/Light.h
+        include/reusable_design_patterns/Observer/IObserver.h
+        include/reusable_design_patterns/Observer/IObservable.h
+        include/RenderObject/RenderObjectLeaf.h
+        include/RenderObject/RenderObjectComposite.h
+        include/RenderObject/RenderObjectComposite.h
+        include/RenderObject/RenderObjectComposite.h
+        src/RenderObjectComposite.cpp
+        src/RenderObjectLeaf.cpp
 )
 
 target_include_directories(proj PUBLIC include)

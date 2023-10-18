@@ -7,9 +7,9 @@
 
 class OpenGLContext {
 public:
-    OpenGLContext(int width, int height, const char *title);
+    static OpenGLContext &get_instance();
 
-    ~OpenGLContext();
+    OpenGLContext &init(int screen_width, int screen_height, const char *title);
 
     bool should_close();
 
@@ -17,16 +17,22 @@ public:
 
     void close();
 
-    static void set_viewport(unsigned short width, unsigned short height);
+    static void set_viewport(unsigned short screen_width, unsigned short screen_height);
 
     static void print_version_info();
 
-    [[nodiscard]] int get_width() const;
+    [[nodiscard]] int get_screen_width() const;
 
-    [[nodiscard]] int get_height() const;
+    [[nodiscard]] int get_screen_height() const;
 
     [[nodiscard]] GLFWwindow *get_window() const;
 
 private:
     GLFWwindow *window;
+
+    static OpenGLContext instance;
+
+    OpenGLContext() = default;
+
+    ~OpenGLContext();
 };

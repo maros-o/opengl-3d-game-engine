@@ -8,10 +8,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <unordered_map>
-#include "CameraObserver.h"
 #include "Camera.h"
 
-class ShaderProgram : public CameraObserver {
+class ShaderProgram : public IObserver {
 public:
     ShaderProgram(const char *shader_file_path, Camera *camera);
 
@@ -33,9 +32,7 @@ public:
 
     void set_camera(Camera *camera);
 
-    void view_matrix_changed() final;
-
-    void projection_matrix_changed() final;
+    void update(int event_type) override;
 
 private:
     GLuint id = 0;

@@ -1,5 +1,7 @@
 #include "OpenGLContext.h"
 
+OpenGLContext OpenGLContext::instance;
+
 static void GLAPIENTRY
 message_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message,
                  const void *user_param) {
@@ -47,41 +49,6 @@ message_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei
     exit(1);
 }
 
-OpenGLContext::OpenGLContext(int width, int height, const char *title) {
-    if (!glfwInit()) {
-        fprintf(stderr, "ERROR: could not start GLFW3\n");
-        exit(EXIT_FAILURE);
-    }
-
-    this->window = glfwCreateWindow(width, height, title, nullptr, nullptr);
-    if (!this->window) {
-        glfwTerminate();
-        fprintf(stderr, "ERROR: could not open window with GLFW3\n");
-        exit(EXIT_FAILURE);
-    }
-
-    glfwMakeContextCurrent(this->window);
-    glfwSwapInterval(1);
-
-    glewExperimental = GL_TRUE;
-    if (glewInit() != GLEW_OK) {
-        fprintf(stderr, "ERROR: could not start GLEW\n");
-        exit(EXIT_FAILURE);
-    }
-
-    glfwGetFramebufferSize(this->window, &width, &height);
-    glViewport(0, 0, width, height);
-
-    glDebugMessageCallback(message_callback, nullptr);
-    glEnable(GL_DEBUG_OUTPUT);
-
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_BLEND);
-
-    glDepthFunc(GL_LESS);
-    glEnable(GL_DEPTH_TEST);
-}
-
 OpenGLContext::~OpenGLContext() {
     glfwDestroyWindow(this->window);
     glfwTerminate();
@@ -106,13 +73,13 @@ void OpenGLContext::print_version_info() {
     printf("Using GLFW %i.%i.%i\n", major, minor, revision);
 }
 
-int OpenGLContext::get_width() const {
+int OpenGLContext::get_screen_width() const {
     int width;
     glfwGetWindowSize(this->window, &width, nullptr);
     return width;
 }
 
-int OpenGLContext::get_height() const {
+int OpenGLContext::get_screen_height() const {
     int height;
     glfwGetWindowSize(this->window, nullptr, &height);
     return height;
@@ -127,6 +94,48 @@ void OpenGLContext::close() {
     glfwSetWindowShouldClose(this->window, GLFW_TRUE);
 }
 
-void OpenGLContext::set_viewport(unsigned short width, unsigned short height) {
-    glViewport(0, 0, width, height);
+void OpenGLContext::set_viewport(unsigned short screen_width, unsigned short screen_height) {
+    glViewport(0, 0, screen_width, screen_height);
 }
+
+OpenGLContext &OpenGLContext::get_instance() {
+    return OpenGLContext::instance;
+}
+
+OpenGLContext &OpenGLContext::init(int screen_width, int screen_height, const char *title) {
+    if (!glfwInit()) {
+        fprintf(stderr, "ERROR: could not start GLFW3\n");
+        exit(EXIT_FAILURE);
+    }
+
+    this->window = glfwCreateWindow(screen_width, screen_height, title, nullptr, nullptr);
+    if (!this->window) {
+        glfwTerminate();
+        fprintf(stderr, "ERROR: could not open window with GLFW3\n");
+        exit(EXIT_FAILURE);
+    }
+
+    glfwMakeContextCurrent(this->window);
+    glfwSwapInterval(1);
+
+    glewExperimental = GL_TRUE;
+    if (glewInit() != GLEW_OK) {
+        fprintf(stderr, "ERROR: could not start GLEW\n");
+        exit(EXIT_FAILURE);
+    }
+
+    glfwGetFramebufferSize(this->window, &screen_width, &screen_height);
+    glViewport(0, 0, screen_width, screen_height);
+
+    glDebugMessageCallback(message_callback, nullptr);
+    glEnable(GL_DEBUG_OUTPUT);
+
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
+
+    glDepthFunc(GL_LESS);
+    glEnable(GL_DEPTH_TEST);
+
+    return *this;
+}
+
