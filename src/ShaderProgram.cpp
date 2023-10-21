@@ -4,6 +4,20 @@
 #include <string>
 #include <sstream>
 
+static std::unordered_map<ShaderUniform, std::string> ShaderUniformToString = {
+        {ShaderUniform::MODEL_MATRIX,            "u_model_matrix"},
+        {ShaderUniform::VIEW_MATRIX,             "u_view_matrix"},
+        {ShaderUniform::PROJECTION_MATRIX,       "u_projection_matrix"},
+        {ShaderUniform::NORMAL_MATRIX,           "u_normal_matrix"},
+        {ShaderUniform::TEXTURE_SAMPLER,         "u_texture_sampler"},
+        {ShaderUniform::CAMERA_WORLD_POSITION,   "u_camera_world_position"},
+        {ShaderUniform::LIGHT_WORLD_POSITION,    "u_light_world_position"},
+        {ShaderUniform::LIGHT_COLOR,             "u_light_color"},
+        {ShaderUniform::LIGHT_AMBIENT_STRENGTH,  "u_ambient_strength"},
+        {ShaderUniform::LIGHT_DIFFUSE_STRENGTH,  "u_diffuse_strength"},
+        {ShaderUniform::LIGHT_SPECULAR_STRENGTH, "u_specular_strength"},
+};
+
 struct ShaderProgramSource {
     char *vertex_source;
     char *fragment_source;
@@ -130,9 +144,11 @@ void ShaderProgram::print_active_uniforms() const {
     }
 }
 
-GLint ShaderProgram::get_uniform_location(const char *name) {
+GLint ShaderProgram::get_uniform_location(ShaderUniform uniform) {
+    std::string name = ShaderUniformToString[uniform];
+
     if (this->uniform_locations.find(name) == this->uniform_locations.end()) {
-        GLint location = glGetUniformLocation(this->id, name);
+        GLint location = glGetUniformLocation(this->id, name.c_str());
         if (location == -1) {
             std::cerr << "ERROR::SHADER::UNIFORM::" << name << "::NOT_FOUND" << std::endl;
             exit(1);
@@ -142,22 +158,24 @@ GLint ShaderProgram::get_uniform_location(const char *name) {
     return this->uniform_locations[name];
 }
 
-void ShaderProgram::set_uniform_vec3f(const char *name, const glm::vec3 &vector) {
-    glUniform3fv(this->get_uniform_location(name), 1, &vector[0]);
+void ShaderProgram::set_uniform_vec3f(ShaderUniform uniform, const glm::vec3 &vector) {
+    glUniform3fv(this->get_uniform_location(uniform), 1, &vector[0]);
 }
 
-void ShaderProgram::set_uniform_vec4f(const char *name, const glm::vec4 &vector) {
-    glUniform4fv(this->get_uniform_location(name), 1, &vector[0]);
+void ShaderProgram::set_uniform_vec4f(ShaderUniform uniform, const glm::vec4 &vector) {
+    glUniform4fv(this->get_uniform_location(uniform), 1, &vector[0]);
 }
 
-void ShaderProgram::set_uniform_mat4f(const char *name, const glm::mat4 &matrix) {
-    GLint location = this->get_uniform_location(name);
-    glUniformMatrix4fv(location, 1, GL_FALSE, &matrix[0][0]);
+void ShaderProgram::set_uniform_mat4f(ShaderUniform uniform, const glm::mat4 &matrix) {
+    glUniformMatrix4fv(this->get_uniform_location(uniform), 1, GL_FALSE, &matrix[0][0]);
 }
 
-void ShaderProgram::set_uniform_1i(const char *name, int value) {
-    GLint location = this->get_uniform_location(name);
-    glUniform1i(location, value);
+void ShaderProgram::set_uniform_1i(ShaderUniform uniform, int value) {
+    glUniform1i(this->get_uniform_location(uniform), value);
+}
+
+void ShaderProgram::set_uniform_1f(ShaderUniform uniform, float value) {
+    glUniform1f(this->get_uniform_location(uniform), value);
 }
 
 void ShaderProgram::set_camera(Camera *new_cam) {
@@ -168,22 +186,50 @@ void ShaderProgram::set_camera(Camera *new_cam) {
     this->camera->subscribe(this);
 
     this->use();
-    this->set_uniform_mat4f("uni_projection_matrix", this->camera->get_projection_matrix());
-    this->set_uniform_mat4f("uni_view_matrix", this->camera->get_view_matrix());
+    this->set_uniform_mat4f(ShaderUniform::PROJECTION_MATRIX, this->camera->get_projection_matrix());
+    this->set_uniform_mat4f(ShaderUniform::VIEW_MATRIX, this->camera->get_view_matrix());
     ShaderProgram::reset();
 }
 
-void ShaderProgram::update(int event_type) {
+void ShaderProgram::set_light(Light *new_light) {
+    if (this->light != nullptr) {
+        this->light->unsubscribe(this);
+    }
+    this->light = new_light;
+    this->light->subscribe(this);
+
+    this->use();
+    this->set_uniform_vec3f(ShaderUniform::LIGHT_WORLD_POSITION, this->light->get_position());
+    this->set_uniform_vec3f(ShaderUniform::LIGHT_COLOR, this->light->get_color());
+    this->set_uniform_1f(ShaderUniform::LIGHT_AMBIENT_STRENGTH, this->light->get_ambient_strength());
+    this->set_uniform_1f(ShaderUniform::LIGHT_DIFFUSE_STRENGTH, this->light->get_diffuse_strength());
+    this->set_uniform_1f(ShaderUniform::LIGHT_SPECULAR_STRENGTH, this->light->get_specular_strength());
+    ShaderProgram::reset();
+}
+
+void ShaderProgram::update(int event) {
     this->use();
 
-    if (event_type == (int) CameraEvent::VIEW) {
-        this->set_uniform_mat4f("uni_view_matrix", this->camera->get_view_matrix());
-        return;
+    switch (event) {
+        case (int) CameraEvent::VIEW:
+            this->set_uniform_mat4f(ShaderUniform::VIEW_MATRIX, this->camera->get_view_matrix());
+            return;
+        case (int) CameraEvent::PROJECTION:
+            this->set_uniform_mat4f(ShaderUniform::PROJECTION_MATRIX, this->camera->get_projection_matrix());
+            this->set_uniform_vec3f(ShaderUniform::CAMERA_WORLD_POSITION, this->camera->get_position());
+            return;
+        case (int) LightEvent::POSITION:
+            this->set_uniform_vec3f(ShaderUniform::LIGHT_WORLD_POSITION, this->light->get_position());
+            return;
+        case (int) LightEvent::COLOR:
+            this->set_uniform_vec3f(ShaderUniform::LIGHT_COLOR, this->light->get_color());
+            return;
+        case (int) LightEvent::STRENGTH:
+            this->set_uniform_1f(ShaderUniform::LIGHT_AMBIENT_STRENGTH, this->light->get_ambient_strength());
+            this->set_uniform_1f(ShaderUniform::LIGHT_DIFFUSE_STRENGTH, this->light->get_diffuse_strength());
+            this->set_uniform_1f(ShaderUniform::LIGHT_SPECULAR_STRENGTH, this->light->get_specular_strength());
+            return;
+        default:
+            throw std::runtime_error("Unknown event type");
     }
-    if (event_type == (int) CameraEvent::PROJECTION) {
-        this->set_uniform_mat4f("uni_projection_matrix", this->camera->get_projection_matrix());
-        return;
-    }
-
-    throw std::runtime_error("Unknown event type");
 }

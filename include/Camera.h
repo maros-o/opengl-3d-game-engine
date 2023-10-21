@@ -2,21 +2,16 @@
 
 #include <glm/glm.hpp>
 #include <vector>
-#include <functional>
 
-#include "reusable_design_patterns/Observer/IObserver.h"
-#include "reusable_design_patterns/Observer/IObservable.h"
+#include "Observer/IObserver.h"
+#include "Observer/IObservable.h"
+#include "Observer/ObserverEvents.h"
 
 const float POV = 60.0f;
 const float SPEED = 0.1f;
 const float SENSITIVITY = 50.0f;
 const float NEAR = 0.1f;
 const float FAR = 100.0f;
-
-enum class CameraEvent {
-    PROJECTION = 0,
-    VIEW = 1
-};
 
 enum class CameraMovement {
     FORWARD,
@@ -34,6 +29,8 @@ public:
     [[nodiscard]] glm::mat4 get_view_matrix() const;
 
     [[nodiscard]] glm::mat4 get_projection_matrix() const;
+
+    [[nodiscard]] glm::vec3 get_position() const;
 
     void move(CameraMovement direction);
 
@@ -62,5 +59,5 @@ private:
 
     std::vector<IObserver *> observers;
 
-    void notify(int event_type) override;
+    void notify(int event) override;
 };

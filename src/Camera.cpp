@@ -83,8 +83,12 @@ void Camera::unsubscribe(IObserver *observer) {
     this->observers.erase(std::remove(this->observers.begin(), this->observers.end(), observer), this->observers.end());
 }
 
-void Camera::notify(int event_type) {
+void Camera::notify(int event) {
     for (auto &observer: this->observers) {
-        observer->update(event_type);
+        observer->update(event);
     }
+}
+
+glm::vec3 Camera::get_position() const {
+    return this->position;
 }

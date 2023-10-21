@@ -4,8 +4,6 @@
 #include <unordered_map>
 
 #include "RenderObject/RenderObject.h"
-#include "RenderObject/RenderObjectLeaf.h"
-#include "RenderObject/RenderObjectComposite.h"
 
 
 class Renderer {

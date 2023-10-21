@@ -32,11 +32,11 @@ void Renderer::render_objects() {
 
         if (model->get_texture() != nullptr) {
             model->get_texture()->bind();
-            this->current_shader->set_uniform_1i("uni_texture_sampler", 0);
+            this->current_shader->set_uniform_1i(ShaderUniform::TEXTURE_SAMPLER, 0);
         }
 
         for (auto &render_object: model_group.second) {
-            this->current_shader->set_uniform_mat4f("uni_model_matrix", render_object->get_model_matrix());
+            this->current_shader->set_uniform_mat4f(ShaderUniform::MODEL_MATRIX, render_object->get_model_matrix());
 
             this->render();
         }

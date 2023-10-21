@@ -8,7 +8,12 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <unordered_map>
+#include <map>
+
 #include "Camera.h"
+#include "Light.h"
+
+enum class ShaderUniform;
 
 class ShaderProgram : public IObserver {
 public:
@@ -20,27 +25,47 @@ public:
 
     static void reset();
 
-    void set_uniform_1i(const char *name, int value);
+    void set_uniform_1i(ShaderUniform uniform, int value);
 
-    void set_uniform_vec3f(const char *name, const glm::vec3 &vector);
+    void set_uniform_1f(ShaderUniform uniform, float value);
 
-    void set_uniform_vec4f(const char *name, const glm::vec4 &vector);
+    void set_uniform_vec3f(ShaderUniform uniform, const glm::vec3 &vector);
 
-    void set_uniform_mat4f(const char *name, const glm::mat4 &matrix);
+    void set_uniform_vec4f(ShaderUniform uniform, const glm::vec4 &vector);
+
+    void set_uniform_mat4f(ShaderUniform uniform, const glm::mat4 &matrix);
 
     void print_active_uniforms() const;
 
     void set_camera(Camera *camera);
 
-    void update(int event_type) override;
+    void set_light(Light *light);
+
+    void update(int event) override;
 
 private:
     GLuint id = 0;
-    std::unordered_map<const char *, GLint> uniform_locations;
+    std::unordered_map<std::string, GLint> uniform_locations;
 
     Camera *camera = nullptr;
 
+    Light *light = nullptr;
+
     void destroy() const;
 
-    GLint get_uniform_location(const char *name);
+    GLint get_uniform_location(ShaderUniform uniform);
+};
+
+enum class ShaderUniform {
+    MODEL_MATRIX,
+    VIEW_MATRIX,
+    PROJECTION_MATRIX,
+    NORMAL_MATRIX,
+    TEXTURE_SAMPLER,
+    CAMERA_WORLD_POSITION,
+    LIGHT_WORLD_POSITION,
+    LIGHT_COLOR,
+    LIGHT_AMBIENT_STRENGTH,
+    LIGHT_DIFFUSE_STRENGTH,
+    LIGHT_SPECULAR_STRENGTH,
 };
