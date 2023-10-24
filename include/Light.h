@@ -1,18 +1,18 @@
 #pragma once
 
-#include "Observer/IObserver.h"
-#include "Observer/IObservable.h"
+#include "Observer/Observer.h"
+#include "Observer/Observable.h"
 #include "glm/glm.hpp"
 
 class RenderObject;
 
-class Light : IObservable {
+class Light : public Observable {
 public:
     Light() = default;
 
-    void subscribe(IObserver *observer) override;
+    void subscribe(Observer *observer) override;
 
-    void unsubscribe(IObserver *observer) override;
+    void unsubscribe(Observer *observer) override;
 
     void notify(int event) override;
 
@@ -50,6 +50,6 @@ private:
 
     RenderObject *render_object = nullptr;
 
-    std::vector<IObserver *> observers;
+    std::vector<Observer *> observers;
 };
 

@@ -15,9 +15,11 @@
 
 enum class ShaderUniform;
 
-class ShaderProgram : public IObserver {
+class ShaderProgram : public Observer {
 public:
     ShaderProgram(const char *shader_file_path, Camera *camera);
+
+    ShaderProgram(const char *shader_file_path, Camera *camera, Light *light);
 
     ~ShaderProgram();
 
@@ -52,6 +54,8 @@ private:
     Light *light = nullptr;
 
     void destroy() const;
+
+    void init(const char *shader_file_path);
 
     GLint get_uniform_location(ShaderUniform uniform);
 };

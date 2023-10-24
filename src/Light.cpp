@@ -3,11 +3,11 @@
 #include "Light.h"
 #include "RenderObject/RenderObject.h"
 
-void Light::subscribe(IObserver *observer) {
+void Light::subscribe(Observer *observer) {
     this->observers.push_back(observer);
 }
 
-void Light::unsubscribe(IObserver *observer) {
+void Light::unsubscribe(Observer *observer) {
     this->observers.erase(std::remove(this->observers.begin(), this->observers.end(), observer), this->observers.end());
 }
 
@@ -43,18 +43,28 @@ void Light::set_color(const glm::vec3 &new_color) {
     this->notify((int) LightEvent::COLOR);
 }
 
+float normalize_strength(float value) {
+    if (value < 0.0f) {
+        return 0.0f;
+    }
+    if (value > 1.0f) {
+        return 1.0f;
+    }
+    return value;
+}
+
 void Light::set_ambient_strength(float value) {
-    this->ambient_strength = value;
+    this->ambient_strength = normalize_strength(value);
     this->notify((int) LightEvent::STRENGTH);
 }
 
 void Light::set_diffuse_strength(float value) {
-    this->diffuse_strength = value;
+    this->diffuse_strength = normalize_strength(value);
     this->notify((int) LightEvent::STRENGTH);
 }
 
 void Light::set_specular_strength(float value) {
-    this->specular_strength = value;
+    this->specular_strength = normalize_strength(value);
     this->notify((int) LightEvent::STRENGTH);
 }
 

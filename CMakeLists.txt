@@ -17,9 +17,11 @@ include_directories(res/3d_models)
 
 set(SOURCE_DIR src)
 file(GLOB SOURCE_FILES ${SOURCE_DIR}/*.cpp)
-add_library(proj_lib ${SOURCE_FILES})
+add_library(proj_lib ${SOURCE_FILES}
+        src/Scene.cpp)
 
-add_executable(proj src/main.cpp)
+add_executable(proj src/main.cpp
+        include/Scene.h)
 
 target_link_libraries(proj_lib glfw GLEW::GLEW -lGL ${ASSIMP_LIBRARIES})
 target_link_libraries(proj proj_lib)

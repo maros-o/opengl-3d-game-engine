@@ -10,6 +10,8 @@ class Renderer {
 public:
     Renderer() = default;
 
+    explicit Renderer(const std::vector<RenderObject *> &objects);
+
     void add_object(RenderObject *object);
 
     void render_objects();

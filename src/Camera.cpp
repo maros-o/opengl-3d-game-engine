@@ -7,7 +7,7 @@
 Camera::Camera(int width, int height) : width(width), height(height) {}
 
 glm::mat4 Camera::get_projection_matrix() const {
-    return glm::perspective(glm::radians(POV), (float) this->width / (float) this->height, NEAR, FAR);
+    return glm::perspective(glm::radians(FOV), (float) this->width / (float) this->height, NEAR, FAR);
 }
 
 glm::mat4 Camera::get_view_matrix() const {
@@ -75,20 +75,19 @@ void Camera::window_resize(int new_width, int new_height) {
     this->notify((int) CameraEvent::PROJECTION);
 }
 
-void Camera::subscribe(IObserver *observer) {
-    this->observers.push_back(observer);
-}
-
-void Camera::unsubscribe(IObserver *observer) {
-    this->observers.erase(std::remove(this->observers.begin(), this->observers.end(), observer), this->observers.end());
-}
-
-void Camera::notify(int event) {
-    for (auto &observer: this->observers) {
-        observer->update(event);
-    }
-}
-
 glm::vec3 Camera::get_position() const {
     return this->position;
+}
+
+void Camera::set_position(glm::vec3 new_position) {
+    this->position = new_position;
+
+    this->notify((int) CameraEvent::VIEW);
+}
+
+void Camera::set_pitch_yaw(float new_pitch, float new_yaw) {
+    this->pitch = new_pitch;
+    this->yaw = new_yaw;
+
+    this->notify((int) CameraEvent::VIEW);
 }

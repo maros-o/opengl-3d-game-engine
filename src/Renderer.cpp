@@ -2,6 +2,11 @@
 #include "RenderObject/RenderObject.h"
 #include "Texture.h"
 
+Renderer::Renderer(const std::vector<RenderObject *> &objects) {
+    for (auto &object: objects) {
+        this->add_object(object);
+    }
+}
 
 void Renderer::clear() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

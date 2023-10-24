@@ -13,8 +13,9 @@ out vec3 v_world_normal;
 
 void main(void) {
     gl_Position = (u_projection_matrix * u_view_matrix * u_model_matrix) * vec4(l_local_position, 1.0f);
+
     v_world_position = u_model_matrix * vec4(l_local_position, 1.0f);
-    v_world_normal = mat3(transpose(inverse(u_model_matrix))) * l_local_normal;
+    v_world_normal = normalize(vec3(transpose(inverse(u_model_matrix)) * vec4(l_local_normal, 1.0f)));
 }
 
 
@@ -38,18 +39,14 @@ out vec4 v_color;
 void main(void) {
     vec3 object_color = vec3(0.0f, 0.0f, 1.0f);
 
-    // ambient
     vec3 ambient = u_ambient_strength * u_light_color;
 
-    // diffuse
     vec3 light_direction = normalize(u_light_world_position - v_world_position.xyz);
     float diffuse_strength = max(dot(v_world_normal, light_direction), 0.0f);
     vec3 diffuse = u_diffuse_strength * diffuse_strength * u_light_color;
 
-
-    // specular
-    vec3 view_direction = normalize(u_camera_world_position - v_world_position.xyz);
     vec3 reflect_direction = reflect(-light_direction, v_world_normal);
+    vec3 view_direction = normalize(u_camera_world_position - v_world_position.xyz);
     float specular_strength = pow(max(dot(view_direction, reflect_direction), 0.0f), 32.0f);
     vec3 specular = u_specular_strength * specular_strength * u_light_color;
 

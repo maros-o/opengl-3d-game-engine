@@ -3,11 +3,11 @@
 #include <glm/glm.hpp>
 #include <vector>
 
-#include "Observer/IObserver.h"
-#include "Observer/IObservable.h"
+#include "Observer/Observer.h"
+#include "Observer/Observable.h"
 #include "Observer/ObserverEvents.h"
 
-const float POV = 60.0f;
+const float FOV = 60.0f;
 const float SPEED = 0.1f;
 const float SENSITIVITY = 50.0f;
 const float NEAR = 0.1f;
@@ -22,7 +22,7 @@ enum class CameraMovement {
     DOWN
 };
 
-class Camera : IObservable {
+class Camera : public Observable {
 public:
     explicit Camera(int width, int height);
 
@@ -32,13 +32,13 @@ public:
 
     [[nodiscard]] glm::vec3 get_position() const;
 
+    void set_position(glm::vec3 position);
+
+    void set_pitch_yaw(float pitch, float yaw);
+
     void move(CameraMovement direction);
 
     void rotate(unsigned short mouse_x, unsigned short mouse_y);
-
-    void subscribe(IObserver *observer) override;
-
-    void unsubscribe(IObserver *observer) override;
 
     void window_resize(int new_width, int new_height);
 
@@ -56,8 +56,4 @@ private:
 
     float pitch = 0.0f;
     float yaw = -90.0f;
-
-    std::vector<IObserver *> observers;
-
-    void notify(int event) override;
 };

@@ -73,7 +73,7 @@ static unsigned int compile_shader(GLuint type, const char *source) {
     return shader;
 }
 
-ShaderProgram::ShaderProgram(const char *shader_file_path, Camera *camera) {
+void ShaderProgram::init(const char *shader_file_path) {
     ShaderProgramSource source = parse_shader(shader_file_path);
 
     GLuint vertex_shader = compile_shader(GL_VERTEX_SHADER, source.vertex_source);
@@ -104,8 +104,17 @@ ShaderProgram::ShaderProgram(const char *shader_file_path, Camera *camera) {
 
     glDeleteShader(fragment_shader);
     glDeleteShader(vertex_shader);
+}
 
+ShaderProgram::ShaderProgram(const char *shader_file_path, Camera *camera) {
+    this->init(shader_file_path);
     this->set_camera(camera);
+}
+
+ShaderProgram::ShaderProgram(const char *shader_file_path, Camera *camera, Light *light) {
+    this->init(shader_file_path);
+    this->set_camera(camera);
+    this->set_light(light);
 }
 
 ShaderProgram::~ShaderProgram() {
@@ -151,7 +160,6 @@ GLint ShaderProgram::get_uniform_location(ShaderUniform uniform) {
         GLint location = glGetUniformLocation(this->id, name.c_str());
         if (location == -1) {
             std::cerr << "ERROR::SHADER::UNIFORM::" << name << "::NOT_FOUND" << std::endl;
-            exit(1);
         }
         this->uniform_locations[name] = location;
     }
@@ -204,6 +212,10 @@ void ShaderProgram::set_light(Light *new_light) {
     this->set_uniform_1f(ShaderUniform::LIGHT_AMBIENT_STRENGTH, this->light->get_ambient_strength());
     this->set_uniform_1f(ShaderUniform::LIGHT_DIFFUSE_STRENGTH, this->light->get_diffuse_strength());
     this->set_uniform_1f(ShaderUniform::LIGHT_SPECULAR_STRENGTH, this->light->get_specular_strength());
+
+    // should be handled by camera, but currently some shaders don't implement this uniform
+    this->set_uniform_vec3f(ShaderUniform::CAMERA_WORLD_POSITION, this->camera->get_position());
+
     ShaderProgram::reset();
 }
 
@@ -211,12 +223,14 @@ void ShaderProgram::update(int event) {
     this->use();
 
     switch (event) {
-        case (int) CameraEvent::VIEW:
-            this->set_uniform_mat4f(ShaderUniform::VIEW_MATRIX, this->camera->get_view_matrix());
-            return;
         case (int) CameraEvent::PROJECTION:
             this->set_uniform_mat4f(ShaderUniform::PROJECTION_MATRIX, this->camera->get_projection_matrix());
-            this->set_uniform_vec3f(ShaderUniform::CAMERA_WORLD_POSITION, this->camera->get_position());
+            return;
+        case (int) CameraEvent::VIEW:
+            this->set_uniform_mat4f(ShaderUniform::VIEW_MATRIX, this->camera->get_view_matrix());
+            if (this->light != nullptr) {
+                this->set_uniform_vec3f(ShaderUniform::CAMERA_WORLD_POSITION, this->camera->get_position());
+            }
             return;
         case (int) LightEvent::POSITION:
             this->set_uniform_vec3f(ShaderUniform::LIGHT_WORLD_POSITION, this->light->get_position());

@@ -1,6 +1,6 @@
 #pragma once
 
-class IObserver {
+class Observer {
 public:
     virtual void update(int event) = 0;
 };
