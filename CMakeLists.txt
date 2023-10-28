@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.26)
-project(proj)
+project(zpg_project)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -17,11 +17,9 @@ include_directories(res/3d_models)
 
 set(SOURCE_DIR src)
 file(GLOB SOURCE_FILES ${SOURCE_DIR}/*.cpp)
-add_library(proj_lib ${SOURCE_FILES}
-        src/Scene.cpp)
+add_library(proj_lib ${SOURCE_FILES})
 
-add_executable(proj src/main.cpp
-        include/Scene.h)
+add_executable(main src/main.cpp
+        include/Transform/Transform.h)
 
-target_link_libraries(proj_lib glfw GLEW::GLEW -lGL ${ASSIMP_LIBRARIES})
-target_link_libraries(proj proj_lib)
+target_link_libraries(main proj_lib glfw GLEW::GLEW -lGL ${ASSIMP_LIBRARIES})

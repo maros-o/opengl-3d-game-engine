@@ -13,7 +13,24 @@
 #include "Camera.h"
 #include "Light.h"
 
-enum class ShaderUniform;
+enum class ShaderUniform {
+    MODEL_MATRIX,
+    VIEW_MATRIX,
+    PROJECTION_MATRIX,
+    NORMAL_MATRIX,
+    TEXTURE_SAMPLER,
+    CAMERA_WORLD_POSITION,
+    LIGHT_WORLD_POSITION,
+    LIGHT_COLOR,
+    LIGHT_CONSTANT,
+    LIGHT_LINEAR,
+    LIGHT_QUADRATIC,
+    OBJECT_COLOR,
+    OBJECT_AMBIENT,
+    OBJECT_DIFFUSE,
+    OBJECT_SPECULAR,
+    OBJECT_SHININESS,
+};
 
 class ShaderProgram : public Observer {
 public:
@@ -27,17 +44,11 @@ public:
 
     static void reset();
 
-    void set_uniform_1i(ShaderUniform uniform, int value);
+    void set_uniform(ShaderUniform uniform, float value);
 
-    void set_uniform_1f(ShaderUniform uniform, float value);
+    void set_uniform(ShaderUniform uniform, const glm::vec3 &vector);
 
-    void set_uniform_vec3f(ShaderUniform uniform, const glm::vec3 &vector);
-
-    void set_uniform_vec4f(ShaderUniform uniform, const glm::vec4 &vector);
-
-    void set_uniform_mat4f(ShaderUniform uniform, const glm::mat4 &matrix);
-
-    void print_active_uniforms() const;
+    void set_uniform(ShaderUniform uniform, const glm::mat4 &matrix);
 
     void set_camera(Camera *camera);
 
@@ -58,18 +69,4 @@ private:
     void init(const char *shader_file_path);
 
     GLint get_uniform_location(ShaderUniform uniform);
-};
-
-enum class ShaderUniform {
-    MODEL_MATRIX,
-    VIEW_MATRIX,
-    PROJECTION_MATRIX,
-    NORMAL_MATRIX,
-    TEXTURE_SAMPLER,
-    CAMERA_WORLD_POSITION,
-    LIGHT_WORLD_POSITION,
-    LIGHT_COLOR,
-    LIGHT_AMBIENT_STRENGTH,
-    LIGHT_DIFFUSE_STRENGTH,
-    LIGHT_SPECULAR_STRENGTH,
 };

@@ -22,14 +22,22 @@ void main(void) {
 #shader fragment
 #version 450 core
 
+// light
 uniform vec3 u_light_world_position;
 uniform vec3 u_light_color;
+uniform float u_light_constant_strength;
+uniform float u_light_linear_strength;
+uniform float u_light_quadratic_strength;
 
+// camera
 uniform vec3 u_camera_world_position;
 
+// object
+uniform vec3 u_object_color;
 uniform float u_ambient_strength;
 uniform float u_diffuse_strength;
 uniform float u_specular_strength;
+uniform float u_shininess;
 
 in vec4 v_world_position;
 in vec3 v_world_normal;
@@ -37,8 +45,6 @@ in vec3 v_world_normal;
 out vec4 v_color;
 
 void main(void) {
-    vec3 object_color = vec3(0.0f, 0.0f, 1.0f);
-
     vec3 ambient = u_ambient_strength * u_light_color;
     vec3 color_strength = ambient;
 
@@ -51,10 +57,14 @@ void main(void) {
 
         vec3 view_direction = normalize(u_camera_world_position - v_world_position.xyz);
         vec3 halfway_direction = normalize(light_direction + view_direction);
-        float specular_strength = pow(max(dot(v_world_normal, halfway_direction), 0.0f), 32.0f);
+        float specular_strength = pow(max(dot(v_world_normal, halfway_direction), 0.0f), u_shininess);
         vec3 specular = u_specular_strength * specular_strength * u_light_color;
         color_strength += specular;
     }
 
-    v_color = vec4(color_strength * object_color, 1.0f);
+    float distance = length(u_light_world_position - v_world_position.xyz);
+    float attenuation = 1.0 / (u_light_constant_strength + u_light_linear_strength * distance + u_light_quadratic_strength * (distance * distance));
+    vec3 attenuated_light_color = u_light_color * attenuation;
+
+    v_color = vec4(color_strength * attenuated_light_color * u_object_color, 1.0f);
 }

@@ -1,7 +1,6 @@
 #include "OpenGLContext.h"
 #include "Renderer.h"
 #include "buffers/EBO.h"
-#include "Engine.h"
 #include "Model.h"
 #include "../res/vertices.h"
 #include "../res/indices.h"
@@ -29,10 +28,7 @@ int main() {
 
     auto light = new Light();
 
-    auto shader_yellow = new ShaderProgram{"../shaders/yellow.glsl", camera};
-    auto shader_blue = new ShaderProgram{"../shaders/blue.glsl", camera};
-    auto shader_lambert = new ShaderProgram{"../shaders/lambert.glsl", camera, light};
-    auto shader_phong = new ShaderProgram{"../shaders/phong.glsl", camera, light};
+    auto shader_constant = new ShaderProgram{"../shaders/constant.glsl", camera};
     auto shader_blinn = new ShaderProgram{"../shaders/blinn.glsl", camera, light};
 
     auto vbo_sphere = new VBO{sphere, 6};
@@ -45,75 +41,87 @@ int main() {
     vao_suzi->link_attributes(0, 3, GL_FLOAT, 6 * sizeof(GLfloat), nullptr);
     vao_suzi->link_attributes(1, 3, GL_FLOAT, 6 * sizeof(GLfloat), (void *) (3 * sizeof(GLfloat)));
 
-    auto blue_model = new Model{"blue_sphere", vao_sphere, shader_blue};
-    auto yellow_model = new Model{"yellow_sphere", vao_sphere, shader_yellow};
-    auto lambert_model = new Model{"lambert_sphere", vao_sphere, shader_lambert};
-    auto phong_model = new Model{"phong_sphere", vao_sphere, shader_phong};
-    auto blinn_model = new Model{"blinn_sphere", vao_sphere, shader_blinn};
+    auto vbo_plain = new VBO{plain, 6};
+    auto vao_plain = new VAO(vbo_plain);
+    vao_plain->link_attributes(0, 3, GL_FLOAT, 6 * sizeof(GLfloat), nullptr);
+    vao_plain->link_attributes(1, 3, GL_FLOAT, 6 * sizeof(GLfloat), (void *) (3 * sizeof(GLfloat)));
 
-    auto blue_suzi_model = new Model{"blue_suzi", vao_suzi, shader_blue};
-    auto lambert_suzi_model = new Model{"lambert_suzi", vao_suzi, shader_lambert};
+    auto vbo_bushes = new VBO{bushes, 6};
+    auto vao_bushes = new VAO(vbo_bushes);
+    vao_bushes->link_attributes(0, 3, GL_FLOAT, 6 * sizeof(GLfloat), nullptr);
+    vao_bushes->link_attributes(1, 3, GL_FLOAT, 6 * sizeof(GLfloat), (void *) (3 * sizeof(GLfloat)));
 
+    auto vbo_tree = new VBO{tree, 6};
+    auto vao_tree = new VAO(vbo_tree);
+    vao_tree->link_attributes(0, 3, GL_FLOAT, 6 * sizeof(GLfloat), nullptr);
+    vao_tree->link_attributes(1, 3, GL_FLOAT, 6 * sizeof(GLfloat), (void *) (3 * sizeof(GLfloat)));
 
-    RenderObject *a_sphere_1 = new RenderObjectLeaf{blinn_model};
+    auto vbo_gift = new VBO{gift, 6};
+    auto vao_gift = new VAO(vbo_gift);
+    vao_gift->link_attributes(0, 3, GL_FLOAT, 6 * sizeof(GLfloat), nullptr);
+    vao_gift->link_attributes(1, 3, GL_FLOAT, 6 * sizeof(GLfloat), (void *) (3 * sizeof(GLfloat)));
 
-    RenderObject *b_sphere_1 = new RenderObjectLeaf{phong_model};
-    RenderObject *b_sphere_2 = new RenderObjectLeaf{blue_model};
-    RenderObject *b_sphere_3 = new RenderObjectLeaf{lambert_model};
-    RenderObject *b_sphere_4 = new RenderObjectLeaf{blinn_model};
+    auto material_yellow = new Material{glm::vec3(255.f, 255.f, 0.f) / 255.f};
+    auto material_blue = new Material{glm::vec3(98.f, 98.f, 255.f) / 255.f};
+    auto material_green = new Material{glm::vec3(25.f, 117.f, 25.f) / 255.f};
 
-    RenderObject *c_sphere_1 = new RenderObjectLeaf{phong_model};
-    RenderObject *c_suzi_1 = new RenderObjectLeaf{blue_suzi_model};
-    RenderObject *c_suzi_2 = new RenderObjectLeaf{lambert_suzi_model};
-    RenderObject *c_sphere_2 = new RenderObjectLeaf{blinn_model};
+    auto model_sun = new Model{"model_sun", vao_sphere, shader_constant, material_yellow};
+    auto model_sphere = new Model{"model_sphere", vao_sphere, shader_blinn, material_blue};
+    auto model_tree = new Model{"model_tree", vao_tree, shader_blinn, material_blue};
+    auto model_plain = new Model{"model_plain", vao_plain, shader_blinn, material_green};
 
-
-    light->set_position(glm::vec3(0.0f, 5.0f, 0.0f));
-    camera->set_position(glm::vec3(0.0f, -5.0f, 0.0f));
-    camera->set_pitch_yaw(90.0f, 0.0f);
-
-    a_sphere_1->set_position(glm::vec3(0.0f, 0.0f, 0.0f));
-
-    b_sphere_1->set_position(glm::vec3(2.0f, 0.0f, 0.0f));
-    b_sphere_2->set_position(glm::vec3(-2.0f, 0.0f, 0.0f));
-    b_sphere_3->set_position(glm::vec3(0.0f, 0.0f, 2.0f));
-    b_sphere_4->set_position(glm::vec3(0.0f, 0.0f, -2.0f));
-
-    c_sphere_1->set_position(glm::vec3(2.0f, 0.0f, 0.0f));
-    c_sphere_2->set_position(glm::vec3(0.0f, 0.0f, -2.0f));
-    c_suzi_1->set_position(glm::vec3(-2.0f, 0.0f, 0.0f));
-    c_suzi_2->set_position(glm::vec3(0.0f, 0.0f, 2.0f));
+    /*
+    auto model_bushes = new Model{"model_bushes", vao_bushes, shader_blinn, glm::vec3{255.f, 25.f, 255.f} / 255.f};
+    auto model_gift = new Model{"model_gift", vao_gift, shader_blinn, glm::vec3{255.f, 25.f, 255.f} / 255.f};
+    auto model_plain = new Model{"model_plain", vao_plain, shader_blinn, glm::vec3{25.f, 117.f, 25.f} / 255.f};
+    auto model_suzi = new Model{"model_suzi", vao_suzi, shader_blinn, glm::vec3{255.f, 25.f, 255.f} / 255.f};
+    auto model_sphere = new Model{"model_sphere", vao_sphere, shader_blinn, glm::vec3(98.f, 98.f, 255.f) / 255.f};
+    */
 
 
-    RenderObject *sun = new RenderObjectLeaf{yellow_model};
+    RenderObject *sun = new RenderObjectLeaf{model_sun};
     sun->scale(0.2f);
     light->set_render_object(sun);
 
-    auto scene_a = new Scene{"scene_a", {sun, a_sphere_1}};
-    auto scene_b = new Scene{"scene_b", {sun, b_sphere_1, b_sphere_2, b_sphere_3, b_sphere_4}};
-    auto scene_c = new Scene{"scene_c", {sun, c_sphere_1, c_sphere_2, c_suzi_1, c_suzi_2}};
+    // scene 1
+    auto sphere1 = new RenderObjectLeaf{model_sphere};
+    sphere1->set_position(glm::vec3(2.f, 0.f, 0.f));
+    auto sphere2 = new RenderObjectLeaf{model_sphere};
+    sphere2->set_position(glm::vec3(-2.f, 0.f, 0.f));
+    auto sphere3 = new RenderObjectLeaf{model_sphere};
+    sphere3->set_position(glm::vec3(0.f, 2.f, 0.f));
+    auto sphere4 = new RenderObjectLeaf{model_sphere};
+    sphere4->set_position(glm::vec3(0.f, -2.f, 0.f));
+
+    auto scene_1 = new Scene{"scene_1", {sun, sphere1, sphere2, sphere3, sphere4}};
+    scene_1->set_on_create([&camera, &light]() {
+        camera->set_position(glm::vec3(0.f, 0.f, 6.f));
+        camera->set_pitch_yaw(0.f, 0.f);
+        light->set_position(glm::vec3(0.f, 0.f, 0.f));
+    });
+
+    // scene 2
+
+
+    // scene 5
+    std::vector<RenderObject *> scene5_render_objects{sun};
+
+    auto floor = new RenderObjectLeaf{model_plain};
+    scene5_render_objects.push_back(floor);
+    floor->scale(100.f);
+
+    for (int x = 0; x < 10; x++) {
+        for (int z = 0; z < 10; z++) {
+            auto tree_obj = new RenderObjectLeaf{model_tree};
+            tree_obj->set_position(glm::vec3(x * 10.f, 0.f, z * 10.f));
+            scene5_render_objects.push_back(tree_obj);
+        }
+    }
+
+    auto scene_5 = new Scene{"scene_forest", {scene5_render_objects}};
 
     // inputs
     {
-        float amount = 0.01f;
-        input_manager.register_key_down_callback(GLFW_KEY_1, [&light, amount]() {
-            light->set_ambient_strength(light->get_ambient_strength() + amount);
-        });
-        input_manager.register_key_down_callback(GLFW_KEY_2, [&light, amount]() {
-            light->set_ambient_strength(light->get_ambient_strength() - amount);
-        });
-        input_manager.register_key_down_callback(GLFW_KEY_3, [&light, amount]() {
-            light->set_diffuse_strength(light->get_diffuse_strength() + amount);
-        });
-        input_manager.register_key_down_callback(GLFW_KEY_4, [&light, amount]() {
-            light->set_diffuse_strength(light->get_diffuse_strength() - amount);
-        });
-        input_manager.register_key_down_callback(GLFW_KEY_5, [&light, amount]() {
-            light->set_specular_strength(light->get_specular_strength() + amount);
-        });
-        input_manager.register_key_down_callback(GLFW_KEY_6, [&light, amount]() {
-            light->set_specular_strength(light->get_specular_strength() - amount);
-        });
         input_manager.register_key_down_callback(GLFW_KEY_UP, [&light]() {
             light->move(glm::vec3(0.0f, 0.0f, .1f));
         });
@@ -152,9 +160,15 @@ int main() {
             camera->move(CameraMovement::DOWN);
         });
         input_manager.register_cursor_position_callback(
-                [&camera, &context](unsigned short pos_x, unsigned short pos_y) {
-                    camera->rotate(pos_x, pos_y);
-                    InputManager::set_cursor_position(context.get_screen_width() / 2, context.get_screen_height() / 2);
+                [&camera, &context, &input_manager](unsigned short pos_x, unsigned short pos_y) {
+                    if (input_manager.is_key_down(GLFW_KEY_K)) {
+                        camera->rotate(pos_x, pos_y);
+                        InputManager::set_cursor_position(context.get_screen_width() / 2,
+                                                          context.get_screen_height() / 2);
+                        glfwSetInputMode(context.get_window(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+                    } else {
+                        glfwSetInputMode(context.get_window(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+                    }
                 });
         input_manager.register_window_resize_callback([&camera](unsigned short width, unsigned short height) {
             camera->window_resize(width, height);
@@ -165,7 +179,5 @@ int main() {
         });
     }
 
-    //scene_a->play();
-    scene_b->play();
-    //scene_c->play();
+    scene_1->play();
 }

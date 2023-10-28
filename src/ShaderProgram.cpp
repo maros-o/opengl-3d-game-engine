@@ -5,17 +5,22 @@
 #include <sstream>
 
 static std::unordered_map<ShaderUniform, std::string> ShaderUniformToString = {
-        {ShaderUniform::MODEL_MATRIX,            "u_model_matrix"},
-        {ShaderUniform::VIEW_MATRIX,             "u_view_matrix"},
-        {ShaderUniform::PROJECTION_MATRIX,       "u_projection_matrix"},
-        {ShaderUniform::NORMAL_MATRIX,           "u_normal_matrix"},
-        {ShaderUniform::TEXTURE_SAMPLER,         "u_texture_sampler"},
-        {ShaderUniform::CAMERA_WORLD_POSITION,   "u_camera_world_position"},
-        {ShaderUniform::LIGHT_WORLD_POSITION,    "u_light_world_position"},
-        {ShaderUniform::LIGHT_COLOR,             "u_light_color"},
-        {ShaderUniform::LIGHT_AMBIENT_STRENGTH,  "u_ambient_strength"},
-        {ShaderUniform::LIGHT_DIFFUSE_STRENGTH,  "u_diffuse_strength"},
-        {ShaderUniform::LIGHT_SPECULAR_STRENGTH, "u_specular_strength"},
+        {ShaderUniform::MODEL_MATRIX,          "u_model_matrix"},
+        {ShaderUniform::VIEW_MATRIX,           "u_view_matrix"},
+        {ShaderUniform::PROJECTION_MATRIX,     "u_projection_matrix"},
+        {ShaderUniform::NORMAL_MATRIX,         "u_normal_matrix"},
+        {ShaderUniform::TEXTURE_SAMPLER,       "u_texture_sampler"},
+        {ShaderUniform::CAMERA_WORLD_POSITION, "u_camera_world_position"},
+        {ShaderUniform::LIGHT_WORLD_POSITION,  "u_light_world_position"},
+        {ShaderUniform::LIGHT_COLOR,           "u_light_color"},
+        {ShaderUniform::LIGHT_CONSTANT,        "u_light_constant_strength"},
+        {ShaderUniform::LIGHT_LINEAR,          "u_light_linear_strength"},
+        {ShaderUniform::LIGHT_QUADRATIC,       "u_light_quadratic_strength"},
+        {ShaderUniform::OBJECT_COLOR,          "u_object_color"},
+        {ShaderUniform::OBJECT_AMBIENT,        "u_ambient_strength"},
+        {ShaderUniform::OBJECT_DIFFUSE,        "u_diffuse_strength"},
+        {ShaderUniform::OBJECT_SPECULAR,       "u_specular_strength"},
+        {ShaderUniform::OBJECT_SHININESS,      "u_shininess"},
 };
 
 struct ShaderProgramSource {
@@ -133,26 +138,6 @@ void ShaderProgram::destroy() const {
     glDeleteProgram(this->id);
 }
 
-void ShaderProgram::print_active_uniforms() const {
-    GLint i;
-    GLint count;
-
-    GLint size;
-    GLenum type;
-
-    const GLsizei bufSize = 32;
-    GLchar name[bufSize];
-    GLsizei length;
-
-    glGetProgramiv(this->id, GL_ACTIVE_UNIFORMS, &count);
-    printf("Active Uniforms: %d\n", count);
-
-    for (i = 0; i < count; i++) {
-        glGetActiveUniform(this->id, (GLuint) i, bufSize, &length, &size, &type, name);
-        printf("Uniform #%d Type: %u, Name: %s, Size: %d\n", i, type, name, size);
-    }
-}
-
 GLint ShaderProgram::get_uniform_location(ShaderUniform uniform) {
     std::string name = ShaderUniformToString[uniform];
 
@@ -166,23 +151,15 @@ GLint ShaderProgram::get_uniform_location(ShaderUniform uniform) {
     return this->uniform_locations[name];
 }
 
-void ShaderProgram::set_uniform_vec3f(ShaderUniform uniform, const glm::vec3 &vector) {
+void ShaderProgram::set_uniform(ShaderUniform uniform, const glm::vec3 &vector) {
     glUniform3fv(this->get_uniform_location(uniform), 1, &vector[0]);
 }
 
-void ShaderProgram::set_uniform_vec4f(ShaderUniform uniform, const glm::vec4 &vector) {
-    glUniform4fv(this->get_uniform_location(uniform), 1, &vector[0]);
-}
-
-void ShaderProgram::set_uniform_mat4f(ShaderUniform uniform, const glm::mat4 &matrix) {
+void ShaderProgram::set_uniform(ShaderUniform uniform, const glm::mat4 &matrix) {
     glUniformMatrix4fv(this->get_uniform_location(uniform), 1, GL_FALSE, &matrix[0][0]);
 }
 
-void ShaderProgram::set_uniform_1i(ShaderUniform uniform, int value) {
-    glUniform1i(this->get_uniform_location(uniform), value);
-}
-
-void ShaderProgram::set_uniform_1f(ShaderUniform uniform, float value) {
+void ShaderProgram::set_uniform(ShaderUniform uniform, float value) {
     glUniform1f(this->get_uniform_location(uniform), value);
 }
 
@@ -194,8 +171,9 @@ void ShaderProgram::set_camera(Camera *new_cam) {
     this->camera->subscribe(this);
 
     this->use();
-    this->set_uniform_mat4f(ShaderUniform::PROJECTION_MATRIX, this->camera->get_projection_matrix());
-    this->set_uniform_mat4f(ShaderUniform::VIEW_MATRIX, this->camera->get_view_matrix());
+    this->set_uniform(ShaderUniform::PROJECTION_MATRIX, this->camera->get_projection_matrix());
+    this->set_uniform(ShaderUniform::VIEW_MATRIX, this->camera->get_view_matrix());
+    this->set_uniform(ShaderUniform::CAMERA_WORLD_POSITION, this->camera->get_position());
     ShaderProgram::reset();
 }
 
@@ -207,15 +185,11 @@ void ShaderProgram::set_light(Light *new_light) {
     this->light->subscribe(this);
 
     this->use();
-    this->set_uniform_vec3f(ShaderUniform::LIGHT_WORLD_POSITION, this->light->get_position());
-    this->set_uniform_vec3f(ShaderUniform::LIGHT_COLOR, this->light->get_color());
-    this->set_uniform_1f(ShaderUniform::LIGHT_AMBIENT_STRENGTH, this->light->get_ambient_strength());
-    this->set_uniform_1f(ShaderUniform::LIGHT_DIFFUSE_STRENGTH, this->light->get_diffuse_strength());
-    this->set_uniform_1f(ShaderUniform::LIGHT_SPECULAR_STRENGTH, this->light->get_specular_strength());
-
-    // should be handled by camera, but currently some shaders don't implement this uniform
-    this->set_uniform_vec3f(ShaderUniform::CAMERA_WORLD_POSITION, this->camera->get_position());
-
+    this->set_uniform(ShaderUniform::LIGHT_WORLD_POSITION, this->light->get_position());
+    this->set_uniform(ShaderUniform::LIGHT_COLOR, this->light->get_color());
+    this->set_uniform(ShaderUniform::LIGHT_CONSTANT, this->light->get_constant_strength());
+    this->set_uniform(ShaderUniform::LIGHT_LINEAR, this->light->get_linear_strength());
+    this->set_uniform(ShaderUniform::LIGHT_QUADRATIC, this->light->get_quadratic_strength());
     ShaderProgram::reset();
 }
 
@@ -224,24 +198,22 @@ void ShaderProgram::update(int event) {
 
     switch (event) {
         case (int) CameraEvent::PROJECTION:
-            this->set_uniform_mat4f(ShaderUniform::PROJECTION_MATRIX, this->camera->get_projection_matrix());
+            this->set_uniform(ShaderUniform::PROJECTION_MATRIX, this->camera->get_projection_matrix());
             return;
         case (int) CameraEvent::VIEW:
-            this->set_uniform_mat4f(ShaderUniform::VIEW_MATRIX, this->camera->get_view_matrix());
-            if (this->light != nullptr) {
-                this->set_uniform_vec3f(ShaderUniform::CAMERA_WORLD_POSITION, this->camera->get_position());
-            }
+            this->set_uniform(ShaderUniform::VIEW_MATRIX, this->camera->get_view_matrix());
+            this->set_uniform(ShaderUniform::CAMERA_WORLD_POSITION, this->camera->get_position());
             return;
         case (int) LightEvent::POSITION:
-            this->set_uniform_vec3f(ShaderUniform::LIGHT_WORLD_POSITION, this->light->get_position());
+            this->set_uniform(ShaderUniform::LIGHT_WORLD_POSITION, this->light->get_position());
             return;
         case (int) LightEvent::COLOR:
-            this->set_uniform_vec3f(ShaderUniform::LIGHT_COLOR, this->light->get_color());
+            this->set_uniform(ShaderUniform::LIGHT_COLOR, this->light->get_color());
             return;
         case (int) LightEvent::STRENGTH:
-            this->set_uniform_1f(ShaderUniform::LIGHT_AMBIENT_STRENGTH, this->light->get_ambient_strength());
-            this->set_uniform_1f(ShaderUniform::LIGHT_DIFFUSE_STRENGTH, this->light->get_diffuse_strength());
-            this->set_uniform_1f(ShaderUniform::LIGHT_SPECULAR_STRENGTH, this->light->get_specular_strength());
+            this->set_uniform(ShaderUniform::LIGHT_CONSTANT, this->light->get_constant_strength());
+            this->set_uniform(ShaderUniform::LIGHT_LINEAR, this->light->get_linear_strength());
+            this->set_uniform(ShaderUniform::LIGHT_QUADRATIC, this->light->get_quadratic_strength());
             return;
         default:
             throw std::runtime_error("Unknown event type");

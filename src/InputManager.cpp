@@ -35,10 +35,6 @@ InputManager &InputManager::init() {
 
         input_manager->mouse_x = (unsigned short) pos_x;
         input_manager->mouse_y = (unsigned short) pos_y;
-
-        if (!input_manager->first_click) {
-            input_manager->first_click = true;
-        }
     });
 
     glfwSetWindowSizeCallback(window, [](GLFWwindow *window, int width, int height) {
@@ -66,11 +62,6 @@ void InputManager::update() {
         this->notify_cursor_position_callbacks();
         this->last_mouse_x = this->mouse_x;
         this->last_mouse_y = this->mouse_y;
-    }
-
-    if (this->first_click && !this->mouse_mode) {
-        glfwSetInputMode(glfwGetCurrentContext(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-        this->mouse_mode = true;
     }
 }
 

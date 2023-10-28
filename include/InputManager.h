@@ -41,9 +41,6 @@ private:
     unsigned short last_mouse_x = 0.0f;
     unsigned short last_mouse_y = 0.0f;
 
-    bool first_click = false;
-    bool mouse_mode = false;
-
     int window_width = 0;
     int window_height = 0;
 

@@ -35,13 +35,15 @@ void Renderer::render_objects() {
         this->current_draw_count = this->current_vao_has_ebo ? model->get_vao()->get_ebo()->get_indices_count()
                                                              : model->get_vao()->get_vbo()->get_vertex_count();
 
-        if (model->get_texture() != nullptr) {
-            model->get_texture()->bind();
-            this->current_shader->set_uniform_1i(ShaderUniform::TEXTURE_SAMPLER, 0);
-        }
+        Material *model_material = model->get_material();
+        this->current_shader->set_uniform(ShaderUniform::OBJECT_COLOR, model_material->get_object_color());
+        this->current_shader->set_uniform(ShaderUniform::OBJECT_AMBIENT, model_material->get_ambient_strength());
+        this->current_shader->set_uniform(ShaderUniform::OBJECT_DIFFUSE, model_material->get_diffuse_strength());
+        this->current_shader->set_uniform(ShaderUniform::OBJECT_SPECULAR, model_material->get_specular_strength());
+        this->current_shader->set_uniform(ShaderUniform::OBJECT_SHININESS, model_material->get_shininess());
 
         for (auto &render_object: model_group.second) {
-            this->current_shader->set_uniform_mat4f(ShaderUniform::MODEL_MATRIX, render_object->get_model_matrix());
+            this->current_shader->set_uniform(ShaderUniform::MODEL_MATRIX, render_object->get_model_matrix());
 
             this->render();
         }
