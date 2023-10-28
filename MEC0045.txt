@@ -1,0 +1,99 @@
+Základy počítačové grafiky 2023/2024
+
+Jméno a příjmení: Maroš Mečiar 
+Login: MEC0045
+
+V několika větách popište kde máte ve zdrojovém kódu danou věc (třída, řádek), jak funguje a jaké má výhody/nevýhody. Splněno nechte, jen pokud je vše splněno a funkční, jinak nesplněno. 
+
+  
+1. Třída ShaderProgram
+----------------------
+  a) splněno
+     Popis: Třída ShaderProgram obsahuje id shaderu v podobě privátní proměnné "id", soubor: ShaderProgram.h, řádek: 60,
+
+  b) splněno
+     Popis: Třída ShaderProgram obsahuje metody "use" a "reset", soubor: ShaderProgram.h, řádky: 43, 45.
+
+  c) splněno
+     Popis: Třída ShaderProgram obsahuje přetížené metody "set_uniform" pro různé proměnné (float, vec3, mat4). První parametr udává, který uniform má být nastaven.
+     Pro přehlednost a menší náchylnost na chyby jsou skutečné názvy uniformů uloženy v enum class ShaderUniform, soubor: ShaderProgram.h, řádky: 16, 47-51.
+
+  d) splněno
+     Popis: Do konstruktoru ShaderProgram se předává cesta k souboru, soubor se následně zpracuje ve statické beztřídní funkci "parse_shader", soubor: ShaderProgram.cpp, řádky: 26-61.
+
+
+2. Třída DrawableModel
+----------------------
+  a) splněno
+     Popis: Třída RenderObject obsahuje model, material, shader a transform, soubor: RenderObject.h, řádky 24-28.
+
+
+3. Transformace
+----------------------
+  a) splněno
+     Popis: Třída Transform nabízí translate, rotate, scale. Tyto funkce je možno libovolně kombinovat a chainovat (sphere->move()->rotate()), soubor: Transform.h, řádky: 10-22.
+
+  b) splněno
+     Popis: Otestováno, na daný objekt stačí použít funkce translate.
+
+  c) splněno
+     Popis: Otestováno pomocí vytvoření TransformComposite, přiřaznení potomka a následné rotaci TransformComposite objektu. Viz scéna s planetami, soubor: main.cpp, řádek: 111.
+
+  d) splněno
+     Popis: Soubory TransformLeaf.h a TransformComposite.h
+
+
+4. Třída Camera
+----------------------
+  a) splněno
+     Popis: Třída Camera nabízí funkce pro pohyb, které jsou následně přiřazeny ke callbackům na daný input v mainu, soubory: Camera.h, main.cpp, řádek: 232.
+
+  b) splněno
+     Popis: Místo pravého tlačítka používám tlačítko K. Metoda pro rozhlížení kamery je implementována ve třídě Camera, soubor: Camera.cpp, řádek: 42.
+
+  c) splněno
+     Popis: Třída Camera dědí ze třídy Observable a notifikuje své observery, pokud se její stav změní, soubor: Camera.h, Camera.cpp.
+
+
+5. Třída Light
+----------------------
+  a) splněno
+     Popis: Ve třídě Light je možné měnit tří složky útlumu. Light dědí ze třídy Observable a notifikuje své observery, pokud se její stav změní, soubor: Light.h
+
+  b) splněno
+     Popis: Light notifikuje své observery (shadery), například se podívejte na funkci "Light::move", soubor: Light.cpp, řádek: 11.
+
+6. Třída Material
+----------------------
+  a) splněno
+     Popis: Třída Material obsahuje barvu objektu, ambient, diffuse, specular a shininess, soubor: Material.h, řádek: 66.
+
+
+
+Testovací scény  
+
+1) Základní test Phongova osvětlovacího modelu.
+----------------------
+  splněno
+  Popis: soubor: main.cpp, řádky 93-109.
+
+2) Test na rotaci a jeji skládání. 
+----------------------
+  splněno 
+  Popis: soubor: main.cpp, řádky 111-147.
+
+3) Test na ořezání světla, které nemůže dopadnou na plochu.
+----------------------
+  splněno 
+  Popis: soubor: main.cpp, řádky 149-158.
+
+4) Test na změnu velikosti obrazovky. 
+----------------------
+  splněno 
+  Popis: Na tento test jsem použij první scénu.
+
+5) Testování na více objektů a použití více shaderu ve scéně (procházení lesa). 
+----------------------
+  splněno 
+  Popis: Na plain jsou vygenerováný 100x tree, 100x, bushes, 100x gift. soubor: main.cpp, řádky 160-208.
+

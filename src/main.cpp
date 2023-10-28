@@ -157,8 +157,7 @@ int main() {
         sphere_scene_3->get_material()->set_shininess(1.f);
     });
 
-    // secen 5
-
+    // scene 5
     auto render_objects = std::vector<RenderObject *>{light_render_obj};
 
     auto plain = new RenderObject{model_plain, shader_blinn, material_green};
@@ -171,32 +170,37 @@ int main() {
     // trees
     for (int x = 0; x < 10; x++) {
         for (int z = 0; z < 10; z++) {
-            auto tree = new RenderObject{model_tree, shader_blinn, material_blue};
-            tree->get_transform()->set_position(glm::vec3(max_x * (random_normalized_float() - 1.f),
-                                                          random_normalized_float() - 1.f,
-                                                          max_z * (random_normalized_float() - 1.f)));
-            tree->get_transform()->scale(random_normalized_float());
-            render_objects.push_back(tree);
+            auto obj = new RenderObject{model_tree, shader_blinn, material_blue};
+            obj->get_transform()->set_position(glm::vec3(max_x * (random_normalized_float() - 1.f),
+                                                         random_normalized_float() - 1.f,
+                                                         max_z * (random_normalized_float() - 1.f)));
+            obj->get_transform()->scale(random_normalized_float());
+            obj->get_transform()->set_rotation(
+                    glm::vec3((random_normalized_float() - 0.5f) * 90.f, 0.f,
+                              (random_normalized_float() - 0.5f) * 90.f));
+            render_objects.push_back(obj);
         }
     }
     // bushes
     for (int x = 0; x < 10; x++) {
         for (int z = 0; z < 10; z++) {
-            auto bush = new RenderObject{model_bushes, shader_blinn, material_green};
-            bush->get_transform()->set_position(glm::vec3(max_x * (random_normalized_float() - 1.f),
-                                                          0.f,
-                                                          max_z * (random_normalized_float() - 1.f)));
-            render_objects.push_back(bush);
+            auto obj = new RenderObject{model_bushes, shader_blinn, material_green};
+            obj->get_transform()->set_position(glm::vec3(max_x * (random_normalized_float() - 1.f),
+                                                         random_normalized_float() - 1.f,
+                                                         max_z * (random_normalized_float() - 1.f)));
+            obj->get_transform()->scale(random_normalized_float() * 4);
+            render_objects.push_back(obj);
         }
     }
     // gifts
     for (int x = 0; x < 10; x++) {
         for (int z = 0; z < 10; z++) {
-            auto gift = new RenderObject{model_gift, shader_blinn, material_red};
-            gift->get_transform()->set_position(glm::vec3(max_x * (random_normalized_float() - 1.f),
-                                                          0.f,
-                                                          max_z * (random_normalized_float() - 1.f)));
-            render_objects.push_back(gift);
+            auto obj = new RenderObject{model_gift, shader_blinn, material_red};
+            obj->get_transform()->scale(random_normalized_float() * 4);
+            obj->get_transform()->set_position(glm::vec3(max_x * (random_normalized_float() - 1.f),
+                                                         random_normalized_float() - 1.f,
+                                                         max_z * (random_normalized_float() - 1.f)));
+            render_objects.push_back(obj);
         }
     }
 
@@ -267,5 +271,5 @@ int main() {
         });
     }
 
-    scene_1->play();
+    scene_5->play();
 }

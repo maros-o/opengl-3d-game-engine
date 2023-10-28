@@ -21,7 +21,7 @@ public:
 
     void set_transform(Transform *new_transform);
 
-protected:
+private:
     Model *model;
     Material *material;
     ShaderProgram *shader;
