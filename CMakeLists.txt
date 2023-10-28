@@ -19,7 +19,6 @@ set(SOURCE_DIR src)
 file(GLOB SOURCE_FILES ${SOURCE_DIR}/*.cpp)
 add_library(proj_lib ${SOURCE_FILES})
 
-add_executable(main src/main.cpp
-        include/Transform/Transform.h)
+add_executable(main src/main.cpp)
 
 target_link_libraries(main proj_lib glfw GLEW::GLEW -lGL ${ASSIMP_LIBRARIES})

@@ -1,5 +1,5 @@
 #include "Renderer.h"
-#include "RenderObject/RenderObject.h"
+#include "RenderObject.h"
 #include "Texture.h"
 
 Renderer::Renderer(const std::vector<RenderObject *> &objects) {
@@ -26,24 +26,25 @@ void Renderer::add_object(RenderObject *object) {
 void Renderer::render_objects() {
     for (auto &model_group: this->objects) {
         auto model = this->models[model_group.first];
-
-        model->get_shader()->use();
         model->get_vao()->bind();
 
         this->current_vao_has_ebo = model->get_vao()->has_ebo();
-        this->current_shader = model->get_shader();
         this->current_draw_count = this->current_vao_has_ebo ? model->get_vao()->get_ebo()->get_indices_count()
                                                              : model->get_vao()->get_vbo()->get_vertex_count();
 
-        Material *model_material = model->get_material();
-        this->current_shader->set_uniform(ShaderUniform::OBJECT_COLOR, model_material->get_object_color());
-        this->current_shader->set_uniform(ShaderUniform::OBJECT_AMBIENT, model_material->get_ambient_strength());
-        this->current_shader->set_uniform(ShaderUniform::OBJECT_DIFFUSE, model_material->get_diffuse_strength());
-        this->current_shader->set_uniform(ShaderUniform::OBJECT_SPECULAR, model_material->get_specular_strength());
-        this->current_shader->set_uniform(ShaderUniform::OBJECT_SHININESS, model_material->get_shininess());
-
         for (auto &render_object: model_group.second) {
-            this->current_shader->set_uniform(ShaderUniform::MODEL_MATRIX, render_object->get_model_matrix());
+            auto shader = render_object->get_shader();
+            shader->use();
+
+            shader->set_uniform(ShaderUniform::MODEL_MATRIX,
+                                render_object->get_transform()->get_model_matrix());
+
+            Material *material = render_object->get_material();
+            shader->set_uniform(ShaderUniform::OBJECT_COLOR, material->get_object_color());
+            shader->set_uniform(ShaderUniform::OBJECT_AMBIENT, material->get_ambient_strength());
+            shader->set_uniform(ShaderUniform::OBJECT_DIFFUSE, material->get_diffuse_strength());
+            shader->set_uniform(ShaderUniform::OBJECT_SPECULAR, material->get_specular_strength());
+            shader->set_uniform(ShaderUniform::OBJECT_SHININESS, material->get_shininess());
 
             this->render();
         }

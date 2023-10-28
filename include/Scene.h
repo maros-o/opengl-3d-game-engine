@@ -3,12 +3,14 @@
 #include <vector>
 
 #include "Renderer.h"
-#include "RenderObject/RenderObject.h"
+#include "RenderObject.h"
 #include "InputManager.h"
+#include "Transform/Transform.h"
 
 class Scene {
 public:
-    explicit Scene(std::string name, const std::vector<RenderObject *> &objects);
+    explicit Scene(std::string name, const std::vector<RenderObject *> &render_objects,
+                   std::vector<Transform *> transforms = std::vector<Transform *>());
 
     ~Scene();
 
@@ -29,7 +31,7 @@ private:
 
     bool is_playing = false;
 
-    std::vector<RenderObject *> objects;
+    std::vector<Transform *> transforms;
 
     std::function<void()> on_create = []() {};
     std::function<void()> on_update = []() {};

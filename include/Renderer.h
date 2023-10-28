@@ -3,7 +3,7 @@
 #include <vector>
 #include <unordered_map>
 
-#include "RenderObject/RenderObject.h"
+#include "RenderObject.h"
 
 
 class Renderer {
@@ -25,6 +25,5 @@ private:
     std::unordered_map<std::string, Model *> models;
 
     GLsizei current_draw_count = 0;
-    ShaderProgram *current_shader = nullptr;
     bool current_vao_has_ebo = false;
 };

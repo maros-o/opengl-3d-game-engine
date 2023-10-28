@@ -1,25 +1,25 @@
 #include <algorithm>
 
 #include "Light.h"
-#include "RenderObject/RenderObject.h"
+#include "RenderObject.h"
 
 void Light::move(const glm::vec3 &offset) {
     this->position += offset;
     if (this->render_object != nullptr) {
-        this->render_object->set_position(this->position);
+        this->render_object->get_transform()->set_position(this->position);
     }
     this->notify((int) LightEvent::POSITION);
 }
 
 void Light::set_render_object(RenderObject *new_render_object) {
     this->render_object = new_render_object;
-    this->render_object->set_position(this->position);
+    this->render_object->get_transform()->set_position(this->position);
 }
 
 void Light::set_position(const glm::vec3 &new_position) {
     this->position = new_position;
     if (this->render_object != nullptr) {
-        this->render_object->set_position(new_position);
+        this->render_object->get_transform()->set_position(new_position);
     }
     this->notify((int) LightEvent::POSITION);
 }

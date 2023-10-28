@@ -1,8 +1,10 @@
 #include "Scene.h"
 
 
-Scene::Scene(std::string name, const std::vector<RenderObject *> &objects) : name(std::move(name)) {
+Scene::Scene(std::string name, const std::vector<RenderObject *> &objects, std::vector<Transform *> transforms) : name(
+        std::move(name)) {
     this->renderer = new Renderer(objects);
+    this->transforms = std::move(transforms);
 }
 
 Scene::~Scene() {
@@ -27,6 +29,9 @@ void Scene::play() {
         input_manager.update();
 
         Renderer::clear();
+        for (auto &transform: this->transforms) {
+            transform->update_local_model_matrix();
+        }
         this->renderer->render_objects();
 
         this->on_update();
@@ -46,6 +51,3 @@ void Scene::set_on_update(std::function<void()> new_on_update) {
 void Scene::stop() {
     this->is_playing = false;
 }
-
-
-

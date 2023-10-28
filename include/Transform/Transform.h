@@ -1,8 +1,10 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <functional>
 
 class Transform {
+public:
     glm::mat4 get_model_matrix();
 
     Transform *translate(glm::vec3 translation);
@@ -19,8 +21,6 @@ class Transform {
 
     Transform *set_scale(glm::vec3 new_scale);
 
-    void set_parent(Transform *parent);
-
     virtual void update_parent_model_matrix() = 0;
 
     virtual void update_local_model_matrix() = 0;
@@ -28,4 +28,24 @@ class Transform {
     virtual Transform *attach(Transform *child) = 0;
 
     virtual Transform *detach(Transform *child) = 0;
+
+    void set_parent(Transform *parent);
+
+protected:
+    Transform *parent = nullptr;
+    
+    glm::mat4 local_model_matrix = glm::mat4(1.0f);
+    glm::mat4 parent_model_matrix = glm::mat4(1.0f);
+
+    bool local_model_matrix_needs_update = true;
+
+    glm::vec3 position{glm::vec3(0.0f, 0.0f, 0.0f)};
+    glm::vec3 rotation{glm::vec3(0.0f, 0.0f, 0.0f)};
+    glm::vec3 measure{glm::vec3(1.0f, 1.0f, 1.0f)};
+
+    void clamp_rotation();
+
+    void calculate_local_model_matrix();
+
+    Transform *apply_transformation(const std::function<void(Transform &)> &transformation);
 };
