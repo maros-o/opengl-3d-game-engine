@@ -36,6 +36,7 @@ void Camera::move(CameraMovement direction) {
             break;
     }
 
+    this->notify((int) CameraEvent::POSITION);
     this->notify((int) CameraEvent::VIEW);
 }
 
@@ -65,6 +66,7 @@ void Camera::rotate(unsigned short mouse_x, unsigned short mouse_y) {
     this->right = glm::normalize(glm::cross(this->front, this->world_up));
     this->up = glm::normalize(glm::cross(this->right, this->front));
 
+    this->notify((int) CameraEvent::POSITION);
     this->notify((int) CameraEvent::VIEW);
 }
 
@@ -83,6 +85,7 @@ void Camera::set_position(glm::vec3 new_position) {
     this->position = new_position;
 
     this->notify((int) CameraEvent::VIEW);
+    this->notify((int) CameraEvent::POSITION);
 }
 
 void Camera::set_pitch_yaw(float new_pitch, float new_yaw) {

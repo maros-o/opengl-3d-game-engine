@@ -202,6 +202,8 @@ void ShaderProgram::update(int event) {
             return;
         case (int) CameraEvent::VIEW:
             this->set_uniform(ShaderUniform::VIEW_MATRIX, this->camera->get_view_matrix());
+            return;
+        case (int) CameraEvent::POSITION:
             this->set_uniform(ShaderUniform::CAMERA_WORLD_POSITION, this->camera->get_position());
             return;
         case (int) LightEvent::POSITION:
