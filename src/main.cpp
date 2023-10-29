@@ -1,14 +1,17 @@
+#include <random>
+#include <assimp/Importer.hpp>
+
 #include "OpenGLContext.h"
 #include "Renderer.h"
-#include "buffers/EBO.h"
 #include "Model.h"
-#include "../res/vertices.h"
-#include "../res/indices.h"
 #include "Camera.h"
 #include "Light.h"
 #include "InputManager.h"
+#include "Scene.h"
 #include "../include/Transform/TransformComposite.h"
-#include <assimp/Importer.hpp>
+
+#include "../res/vertices.h"
+#include "../res/indices.h"
 #include "../res/3d_models/plain.h"
 #include "../res/3d_models/suzi_flat.h"
 #include "../res/3d_models/suzi_smooth.h"
@@ -16,13 +19,13 @@
 #include "../res/3d_models/gift.h"
 #include "../res/3d_models/bushes.h"
 #include "../res/3d_models/tree.h"
-#include "Scene.h"
 
 static float random_normalized_float() {
-    std::cout << static_cast<float>(rand()) / static_cast<float>(RAND_MAX) << std::endl;
-    return static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    std::uniform_real_distribution<float> dis(0.0f, 1.0f);
+    return dis(gen);
 }
-
 
 int main() {
     OpenGLContext &context = OpenGLContext::get_instance().init(900, 600, "ZPG - MEC0045");
@@ -33,59 +36,50 @@ int main() {
 
     auto light = new Light();
 
+    // shaders
     auto shader_constant = new ShaderProgram{"../shaders/constant.glsl", camera};
     auto shader_blinn = new ShaderProgram{"../shaders/blinn.glsl", camera, light};
     auto shader_phong = new ShaderProgram{"../shaders/phong.glsl", camera, light};
 
-    auto vbo_sphere = new VBO{sphere, 6};
-    auto vao_sphere = new VAO(vbo_sphere);
+    // vaos
+    auto vao_sphere = new VAO(VBO{sphere, 6});
     vao_sphere->link_attributes(0, 3, GL_FLOAT, 6 * sizeof(GLfloat), nullptr);
     vao_sphere->link_attributes(1, 3, GL_FLOAT, 6 * sizeof(GLfloat), (void *) (3 * sizeof(GLfloat)));
 
-    auto vbo_suzi = new VBO{suzi_smooth, 6};
-    auto vao_suzi = new VAO(vbo_suzi);
+    auto vao_suzi = new VAO(VBO{suzi_smooth, 6});
     vao_suzi->link_attributes(0, 3, GL_FLOAT, 6 * sizeof(GLfloat), nullptr);
     vao_suzi->link_attributes(1, 3, GL_FLOAT, 6 * sizeof(GLfloat), (void *) (3 * sizeof(GLfloat)));
 
-    auto vbo_plain = new VBO{plain, 6};
-    auto vao_plain = new VAO(vbo_plain);
+    auto vao_plain = new VAO(VBO{plain, 6});
     vao_plain->link_attributes(0, 3, GL_FLOAT, 6 * sizeof(GLfloat), nullptr);
     vao_plain->link_attributes(1, 3, GL_FLOAT, 6 * sizeof(GLfloat), (void *) (3 * sizeof(GLfloat)));
 
-    auto vbo_bushes = new VBO{bushes, 6};
-    auto vao_bushes = new VAO(vbo_bushes);
+    auto vao_bushes = new VAO(VBO{bushes, 6});
     vao_bushes->link_attributes(0, 3, GL_FLOAT, 6 * sizeof(GLfloat), nullptr);
     vao_bushes->link_attributes(1, 3, GL_FLOAT, 6 * sizeof(GLfloat), (void *) (3 * sizeof(GLfloat)));
 
-    auto vbo_tree = new VBO{tree, 6};
-    auto vao_tree = new VAO(vbo_tree);
+    auto vao_tree = new VAO(VBO{tree, 6});
     vao_tree->link_attributes(0, 3, GL_FLOAT, 6 * sizeof(GLfloat), nullptr);
     vao_tree->link_attributes(1, 3, GL_FLOAT, 6 * sizeof(GLfloat), (void *) (3 * sizeof(GLfloat)));
 
-    auto vbo_gift = new VBO{gift, 6};
-    auto vao_gift = new VAO(vbo_gift);
+    auto vao_gift = new VAO(VBO{gift, 6});
     vao_gift->link_attributes(0, 3, GL_FLOAT, 6 * sizeof(GLfloat), nullptr);
     vao_gift->link_attributes(1, 3, GL_FLOAT, 6 * sizeof(GLfloat), (void *) (3 * sizeof(GLfloat)));
 
+    // materials
     auto material_yellow = new Material{glm::vec3(255.f, 255.f, 0.f) / 255.f};
     auto material_blue = new Material{glm::vec3(98.f, 98.f, 255.f) / 255.f};
     auto material_green = new Material{glm::vec3(25.f, 117.f, 25.f) / 255.f};
     auto material_grey = new Material{glm::vec3(100.f, 100.f, 100.f) / 255.f};
     auto material_red = new Material{glm::vec3(255.f, 25.f, 25.f) / 255.f};
 
+    // models
     auto model_sphere = new Model{"model_sphere", vao_sphere};
     auto model_tree = new Model{"model_tree", vao_tree};
     auto model_plain = new Model{"model_plain", vao_plain};
     auto model_bushes = new Model{"model_bushes", vao_bushes};
     auto model_gift = new Model{"model_gift", vao_gift};
 
-    /*
-    auto model_bushes = new Model{"model_bushes", vao_bushes, shader_blinn, glm::vec3{255.f, 25.f, 255.f} / 255.f};
-    auto model_gift = new Model{"model_gift", vao_gift, shader_blinn, glm::vec3{255.f, 25.f, 255.f} / 255.f};
-    auto model_plain = new Model{"model_plain", vao_plain, shader_blinn, glm::vec3{25.f, 117.f, 25.f} / 255.f};
-    auto model_suzi = new Model{"model_suzi", vao_suzi, shader_blinn, glm::vec3{255.f, 25.f, 255.f} / 255.f};
-    auto model_sphere = new Model{"model_sphere", vao_sphere, shader_blinn, glm::vec3(98.f, 98.f, 255.f) / 255.f};
-    */
 
     auto *light_render_obj = new RenderObject{model_sphere, shader_constant, material_yellow};
     light->set_render_object(light_render_obj);
@@ -160,9 +154,9 @@ int main() {
     // scene 5
     auto render_objects = std::vector<RenderObject *>{light_render_obj};
 
-    auto plain = new RenderObject{model_plain, shader_blinn, material_green};
-    render_objects.push_back(plain);
-    plain->get_transform()->scale(1000.f);
+    auto floor = new RenderObject{model_plain, shader_blinn, material_green};
+    render_objects.push_back(floor);
+    floor->get_transform()->scale(1000.f);
 
     float max_x = 30.f;
     float max_z = 30.f;
@@ -205,7 +199,7 @@ int main() {
     }
 
     auto scene_5 = new Scene{"scene_5", render_objects, {}};
-    scene_5->set_on_create([&camera, &light, &light_render_obj, &render_objects]() {
+    scene_5->set_on_create([&camera, &light, &light_render_obj]() {
         camera->set_position(glm::vec3(0.f, 0.f, 6.f));
         camera->set_pitch_yaw(0.f, 0.f);
         light->set_position(glm::vec3(0.f, 10.f, 0.f));

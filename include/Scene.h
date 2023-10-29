@@ -9,8 +9,9 @@
 
 class Scene {
 public:
-    explicit Scene(std::string name, const std::vector<RenderObject *> &render_objects,
-                   std::vector<Transform *> transforms = std::vector<Transform *>());
+    Scene(std::string name, const std::vector<RenderObject *> &render_objects);
+
+    Scene(std::string name, const std::vector<RenderObject *> &render_objects, std::vector<Transform *> transforms);
 
     ~Scene();
 

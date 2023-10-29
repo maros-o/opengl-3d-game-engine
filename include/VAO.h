@@ -3,12 +3,13 @@
 #include "buffers/VBO.h"
 #include "buffers/EBO.h"
 #include <iostream>
+#include <optional>
 
 class VAO {
 public:
-    explicit VAO(VBO *vbo);
+    explicit VAO(const VBO &vbo);
 
-    VAO(VBO *vbo, EBO *ebo);
+    VAO(const VBO &vbo, EBO ebo);
 
     ~VAO();
 
@@ -20,9 +21,9 @@ public:
 
     static void unbind();
 
-    [[nodiscard]] const VBO *get_vbo() const;
+    [[nodiscard]] VBO get_vbo() const;
 
-    [[nodiscard]] const EBO *get_ebo() const;
+    [[nodiscard]] std::optional<EBO> get_ebo() const;
 
     [[nodiscard]] bool has_ebo() const;
 
@@ -30,8 +31,8 @@ public:
 private:
     GLuint id = 0;
 
-    const VBO *vbo = nullptr;
-    const EBO *ebo = nullptr;
+    const VBO vbo;
+    const std::optional<EBO> ebo;
 
     void destroy();
 };

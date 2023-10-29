@@ -9,10 +9,6 @@ VBO::VBO(const std::vector<GLfloat> &vertices, GLsizei values_per_vertex) {
                  GL_STATIC_DRAW);
 }
 
-VBO::~VBO() {
-    this->destroy();
-}
-
 void VBO::bind() const {
     glBindBuffer(GL_ARRAY_BUFFER, this->id);
 }

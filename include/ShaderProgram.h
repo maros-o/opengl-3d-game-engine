@@ -44,11 +44,11 @@ public:
 
     static void reset();
 
-    void set_uniform(ShaderUniform uniform, float value);
+    void set_uniform(ShaderUniform uniform, float _float);
 
-    void set_uniform(ShaderUniform uniform, const glm::vec3 &vector);
+    void set_uniform(ShaderUniform uniform, const glm::vec3 &_vec3);
 
-    void set_uniform(ShaderUniform uniform, const glm::mat4 &matrix);
+    void set_uniform(ShaderUniform uniform, const glm::mat4 &_mat4);
 
     void set_camera(Camera *camera);
 

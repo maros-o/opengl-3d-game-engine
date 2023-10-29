@@ -29,8 +29,8 @@ void Renderer::render_objects() {
         model->get_vao()->bind();
 
         this->current_vao_has_ebo = model->get_vao()->has_ebo();
-        this->current_draw_count = this->current_vao_has_ebo ? model->get_vao()->get_ebo()->get_indices_count()
-                                                             : model->get_vao()->get_vbo()->get_vertex_count();
+        this->current_draw_count = this->current_vao_has_ebo ? model->get_vao()->get_ebo().value().get_indices_count()
+                                                             : model->get_vao()->get_vbo().get_vertex_count();
 
         for (auto &render_object: model_group.second) {
             auto shader = render_object->get_shader();

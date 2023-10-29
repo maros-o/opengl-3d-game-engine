@@ -1,10 +1,13 @@
 #include "Scene.h"
 
 
+Scene::Scene(std::string name, const std::vector<RenderObject *> &render_objects) : name(std::move(name)) {
+    this->renderer = new Renderer(render_objects);
+}
+
 Scene::Scene(std::string name, const std::vector<RenderObject *> &objects, std::vector<Transform *> transforms) : name(
-        std::move(name)) {
+        std::move(name)), transforms(std::move(transforms)) {
     this->renderer = new Renderer(objects);
-    this->transforms = std::move(transforms);
 }
 
 Scene::~Scene() {
@@ -28,13 +31,14 @@ void Scene::play() {
         InputManager::poll_events();
         input_manager.update();
 
-        Renderer::clear();
+        this->on_update();
+
         for (auto &transform: this->transforms) {
             transform->update_local_model_matrix();
         }
-        this->renderer->render_objects();
 
-        this->on_update();
+        Renderer::clear();
+        this->renderer->render_objects();
 
         context.swap_buffers();
     }

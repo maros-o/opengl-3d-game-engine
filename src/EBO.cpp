@@ -9,10 +9,6 @@ EBO::EBO(const std::vector<GLuint> &indices) {
                  GL_STATIC_DRAW);
 }
 
-EBO::~EBO() {
-    this->destroy();
-}
-
 void EBO::bind() const {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->id);
 }
