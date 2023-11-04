@@ -62,7 +62,6 @@ public:
         this->shininess = new_shininess;
     }
 
-
 private:
     glm::vec3 object_color{glm::vec3(1.0f, 1.0f, 1.0f)};
 

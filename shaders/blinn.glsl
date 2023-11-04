@@ -23,11 +23,18 @@ void main(void) {
 #version 450 core
 
 // light
-uniform vec3 u_light_world_position;
-uniform vec3 u_light_color;
-uniform float u_light_constant_strength;
-uniform float u_light_linear_strength;
-uniform float u_light_quadratic_strength;
+struct Light {
+    vec4 world_position;
+    vec4 color;
+    float constant_strength;
+    float linear_strength;
+    float quadratic_strength;
+    float padding_1;
+};
+
+layout(std430, binding = 0) buffer LightsSSBO {
+    Light ssbo_lights[];
+};
 
 // camera
 uniform vec3 u_camera_world_position;
@@ -42,29 +49,36 @@ uniform float u_shininess;
 in vec4 v_world_position;
 in vec3 v_world_normal;
 
-out vec4 v_color;
+out vec4 fragColor;
 
-void main(void) {
-    vec3 ambient = u_ambient_strength * u_light_color;
-    vec3 color_strength = ambient;
+void main() {
+    vec3 color_strength = vec3(0.0);
 
-    vec3 light_direction = normalize(u_light_world_position - v_world_position.xyz);
-    float diffuse_strength = max(dot(v_world_normal, light_direction), 0.0f);
+    for (int i = 0; i < ssbo_lights.length(); ++i) {
+        vec3 light_world_position = vec3(ssbo_lights[i].world_position) / ssbo_lights[i].world_position.w;
+        vec3 light_color = vec3(ssbo_lights[i].color);
 
-    if (diffuse_strength > 0.0f) {
-        vec3 diffuse = u_diffuse_strength * diffuse_strength * u_light_color;
-        color_strength += diffuse;
+        vec3 vertex_world_position = vec3(v_world_position) / v_world_position.w;
 
-        vec3 view_direction = normalize(u_camera_world_position - v_world_position.xyz);
-        vec3 halfway_direction = normalize(light_direction + view_direction);
-        float specular_strength = pow(max(dot(v_world_normal, halfway_direction), 0.0f), u_shininess);
-        vec3 specular = u_specular_strength * specular_strength * u_light_color;
-        color_strength += specular;
+        vec3 light_direction = normalize(light_world_position - vertex_world_position);
+        float diffuse_strength = max(dot(v_world_normal, light_direction), 0.0);
+
+        if (diffuse_strength > 0.0) {
+            vec3 ambient = u_ambient_strength * light_color;
+            vec3 diffuse = u_diffuse_strength * diffuse_strength * light_color;
+
+            vec3 view_direction = normalize(u_camera_world_position - vertex_world_position);
+            vec3 halfway_direction = normalize(light_direction + view_direction);
+            float specular_strength = pow(max(dot(v_world_normal, halfway_direction), 0.0), u_shininess);
+            vec3 specular = u_specular_strength * specular_strength * light_color;
+
+            float distance = length(light_world_position - vertex_world_position);
+            float attenuation = 1.0 / (ssbo_lights[i].constant_strength + ssbo_lights[i].linear_strength * distance + ssbo_lights[i].quadratic_strength * (distance * distance));
+            vec3 attenuated_light_color = light_color * attenuation;
+
+            color_strength += (ambient + diffuse + specular) * attenuated_light_color;
+        }
     }
 
-    float distance = length(u_light_world_position - v_world_position.xyz);
-    float attenuation = 1.0 / (u_light_constant_strength + u_light_linear_strength * distance + u_light_quadratic_strength * (distance * distance));
-    vec3 attenuated_light_color = u_light_color * attenuation;
-
-    v_color = vec4(color_strength * attenuated_light_color * u_object_color, 1.0f);
+    fragColor = vec4(color_strength * u_object_color, 1.0);
 }

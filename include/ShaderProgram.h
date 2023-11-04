@@ -12,6 +12,7 @@
 
 #include "Camera.h"
 #include "Light.h"
+#include "buffers/SSBO.h"
 
 enum class ShaderUniform {
     MODEL_MATRIX,
@@ -20,29 +21,27 @@ enum class ShaderUniform {
     NORMAL_MATRIX,
     TEXTURE_SAMPLER,
     CAMERA_WORLD_POSITION,
-    LIGHT_WORLD_POSITION,
-    LIGHT_COLOR,
-    LIGHT_CONSTANT,
-    LIGHT_LINEAR,
-    LIGHT_QUADRATIC,
     OBJECT_COLOR,
     OBJECT_AMBIENT,
     OBJECT_DIFFUSE,
     OBJECT_SPECULAR,
     OBJECT_SHININESS,
+    LIGHT_COUNT,
 };
 
 class ShaderProgram : public Observer {
 public:
     ShaderProgram(const char *shader_file_path, Camera *camera);
 
-    ShaderProgram(const char *shader_file_path, Camera *camera, Light *light);
+    ShaderProgram(const char *shader_file_path, Camera *camera, std::vector<Light *> lights);
 
     ~ShaderProgram();
 
     void use() const;
 
     static void reset();
+
+    void set_uniform(ShaderUniform uniform, int _int);
 
     void set_uniform(ShaderUniform uniform, float _float);
 
@@ -52,7 +51,7 @@ public:
 
     void set_camera(Camera *camera);
 
-    void set_light(Light *light);
+    void set_lights(std::vector<Light *> lights);
 
     void update(int event) override;
 
@@ -62,11 +61,14 @@ private:
 
     Camera *camera = nullptr;
 
-    Light *light = nullptr;
+    std::vector<Light *> lights;
+    SSBO ssbo_lights{0};
 
     void destroy() const;
 
     void init(const char *shader_file_path);
 
     GLint get_uniform_location(ShaderUniform uniform);
+
+    void update_ssbo_lights();
 };

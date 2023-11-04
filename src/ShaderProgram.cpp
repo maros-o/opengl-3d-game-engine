@@ -1,8 +1,10 @@
 #include "ShaderProgram.h"
+#include "buffers/SSBO.h"
 #include <fstream>
 #include <iostream>
 #include <string>
 #include <sstream>
+#include <utility>
 
 static std::unordered_map<ShaderUniform, std::string> ShaderUniformToString = {
         {ShaderUniform::MODEL_MATRIX,          "u_model_matrix"},
@@ -11,16 +13,12 @@ static std::unordered_map<ShaderUniform, std::string> ShaderUniformToString = {
         {ShaderUniform::NORMAL_MATRIX,         "u_normal_matrix"},
         {ShaderUniform::TEXTURE_SAMPLER,       "u_texture_sampler"},
         {ShaderUniform::CAMERA_WORLD_POSITION, "u_camera_world_position"},
-        {ShaderUniform::LIGHT_WORLD_POSITION,  "u_light_world_position"},
-        {ShaderUniform::LIGHT_COLOR,           "u_light_color"},
-        {ShaderUniform::LIGHT_CONSTANT,        "u_light_constant_strength"},
-        {ShaderUniform::LIGHT_LINEAR,          "u_light_linear_strength"},
-        {ShaderUniform::LIGHT_QUADRATIC,       "u_light_quadratic_strength"},
         {ShaderUniform::OBJECT_COLOR,          "u_object_color"},
         {ShaderUniform::OBJECT_AMBIENT,        "u_ambient_strength"},
         {ShaderUniform::OBJECT_DIFFUSE,        "u_diffuse_strength"},
         {ShaderUniform::OBJECT_SPECULAR,       "u_specular_strength"},
         {ShaderUniform::OBJECT_SHININESS,      "u_shininess"},
+        {ShaderUniform::LIGHT_COUNT,           "u_light_count"},
 };
 
 struct ShaderProgramSource {
@@ -116,10 +114,10 @@ ShaderProgram::ShaderProgram(const char *shader_file_path, Camera *camera) {
     this->set_camera(camera);
 }
 
-ShaderProgram::ShaderProgram(const char *shader_file_path, Camera *camera, Light *light) {
+ShaderProgram::ShaderProgram(const char *shader_file_path, Camera *camera, std::vector<Light *> lights) {
     this->init(shader_file_path);
     this->set_camera(camera);
-    this->set_light(light);
+    this->set_lights(std::move(lights));
 }
 
 ShaderProgram::~ShaderProgram() {
@@ -128,6 +126,7 @@ ShaderProgram::~ShaderProgram() {
 
 void ShaderProgram::use() const {
     glUseProgram(this->id);
+    this->ssbo_lights.bind_base();
 }
 
 void ShaderProgram::reset() {
@@ -151,16 +150,20 @@ GLint ShaderProgram::get_uniform_location(ShaderUniform uniform) {
     return this->uniform_locations[name];
 }
 
-void ShaderProgram::set_uniform(ShaderUniform uniform, const glm::vec3 &vector) {
-    glUniform3fv(this->get_uniform_location(uniform), 1, &vector[0]);
+void ShaderProgram::set_uniform(ShaderUniform uniform, const glm::vec3 &_vec3) {
+    glUniform3fv(this->get_uniform_location(uniform), 1, &_vec3[0]);
 }
 
-void ShaderProgram::set_uniform(ShaderUniform uniform, const glm::mat4 &matrix) {
-    glUniformMatrix4fv(this->get_uniform_location(uniform), 1, GL_FALSE, &matrix[0][0]);
+void ShaderProgram::set_uniform(ShaderUniform uniform, const glm::mat4 &_mat4) {
+    glUniformMatrix4fv(this->get_uniform_location(uniform), 1, GL_FALSE, &_mat4[0][0]);
 }
 
-void ShaderProgram::set_uniform(ShaderUniform uniform, float value) {
-    glUniform1f(this->get_uniform_location(uniform), value);
+void ShaderProgram::set_uniform(ShaderUniform uniform, float _float) {
+    glUniform1f(this->get_uniform_location(uniform), _float);
+}
+
+void ShaderProgram::set_uniform(ShaderUniform uniform, int _int) {
+    glUniform1i(this->get_uniform_location(uniform), _int);
 }
 
 void ShaderProgram::set_camera(Camera *new_cam) {
@@ -177,20 +180,16 @@ void ShaderProgram::set_camera(Camera *new_cam) {
     ShaderProgram::reset();
 }
 
-void ShaderProgram::set_light(Light *new_light) {
-    if (this->light != nullptr) {
-        this->light->unsubscribe(this);
+void ShaderProgram::set_lights(std::vector<Light *> new_lights) {
+    for (auto light: this->lights) {
+        light->unsubscribe(this);
     }
-    this->light = new_light;
-    this->light->subscribe(this);
+    this->lights = std::move(new_lights);
+    for (auto light: this->lights) {
+        light->subscribe(this);
+    }
 
-    this->use();
-    this->set_uniform(ShaderUniform::LIGHT_WORLD_POSITION, this->light->get_position());
-    this->set_uniform(ShaderUniform::LIGHT_COLOR, this->light->get_color());
-    this->set_uniform(ShaderUniform::LIGHT_CONSTANT, this->light->get_constant_strength());
-    this->set_uniform(ShaderUniform::LIGHT_LINEAR, this->light->get_linear_strength());
-    this->set_uniform(ShaderUniform::LIGHT_QUADRATIC, this->light->get_quadratic_strength());
-    ShaderProgram::reset();
+    this->update_ssbo_lights();
 }
 
 void ShaderProgram::update(int event) {
@@ -207,17 +206,35 @@ void ShaderProgram::update(int event) {
             this->set_uniform(ShaderUniform::CAMERA_WORLD_POSITION, this->camera->get_position());
             return;
         case (int) LightEvent::POSITION:
-            this->set_uniform(ShaderUniform::LIGHT_WORLD_POSITION, this->light->get_position());
-            return;
         case (int) LightEvent::COLOR:
-            this->set_uniform(ShaderUniform::LIGHT_COLOR, this->light->get_color());
-            return;
         case (int) LightEvent::STRENGTH:
-            this->set_uniform(ShaderUniform::LIGHT_CONSTANT, this->light->get_constant_strength());
-            this->set_uniform(ShaderUniform::LIGHT_LINEAR, this->light->get_linear_strength());
-            this->set_uniform(ShaderUniform::LIGHT_QUADRATIC, this->light->get_quadratic_strength());
+            this->update_ssbo_lights();
             return;
         default:
             throw std::runtime_error("Unknown event type");
     }
+}
+
+struct LightSSBO {
+    glm::vec4 world_position;   // 16 bytes
+    glm::vec4 color;            // 16 bytes
+    float constant_strength;    // 4 bytes
+    float linear_strength;      // 4 bytes
+    float quadratic_strength;   // 4 bytes
+    float padding_1;            // 4 bytes
+};                              // 48 bytes (multiple of 4, 8, 16)
+
+void ShaderProgram::update_ssbo_lights() {
+    std::vector<LightSSBO> lights_ssbo_data;
+    for (auto light: this->lights) {
+        lights_ssbo_data.push_back({
+                                           glm::vec4(light->get_position(), 1.f),
+                                           glm::vec4(light->get_color(), 1.f),
+                                           light->get_constant_strength(),
+                                           light->get_linear_strength(),
+                                           light->get_quadratic_strength(),
+                                           0.f
+                                   });
+    }
+    this->ssbo_lights.allocate_data(lights_ssbo_data.size() * sizeof(LightSSBO), lights_ssbo_data.data());
 }

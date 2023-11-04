@@ -17,8 +17,10 @@ include_directories(res/3d_models)
 
 set(SOURCE_DIR src)
 file(GLOB SOURCE_FILES ${SOURCE_DIR}/*.cpp)
-add_library(proj_lib ${SOURCE_FILES})
+add_library(proj_lib ${SOURCE_FILES}
+        src/SSBO.cpp)
 
-add_executable(main src/main.cpp)
+add_executable(main src/main.cpp
+        include/buffers/SSBO.h)
 
 target_link_libraries(main proj_lib glfw GLEW::GLEW -lGL ${ASSIMP_LIBRARIES})

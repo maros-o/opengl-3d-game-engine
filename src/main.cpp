@@ -34,37 +34,40 @@ int main() {
 
     auto camera = new Camera(context.get_screen_width(), context.get_screen_height());
 
-    auto light = new Light();
+    auto light_1 = new Light();
+    auto light_2 = new Light();
+
 
     // shaders
     auto shader_constant = new ShaderProgram{"../shaders/constant.glsl", camera};
-    auto shader_blinn = new ShaderProgram{"../shaders/blinn.glsl", camera, light};
-    auto shader_phong = new ShaderProgram{"../shaders/phong.glsl", camera, light};
+    auto shader_blinn = new ShaderProgram{"../shaders/blinn.glsl", camera, {light_1, light_2}};
 
     // vaos
     auto vao_sphere = new VAO(VBO{sphere, 6});
-    vao_sphere->link_attributes(0, 3, GL_FLOAT, 6 * sizeof(GLfloat), nullptr);
-    vao_sphere->link_attributes(1, 3, GL_FLOAT, 6 * sizeof(GLfloat), (void *) (3 * sizeof(GLfloat)));
-
     auto vao_suzi = new VAO(VBO{suzi_smooth, 6});
-    vao_suzi->link_attributes(0, 3, GL_FLOAT, 6 * sizeof(GLfloat), nullptr);
-    vao_suzi->link_attributes(1, 3, GL_FLOAT, 6 * sizeof(GLfloat), (void *) (3 * sizeof(GLfloat)));
-
     auto vao_plain = new VAO(VBO{plain, 6});
-    vao_plain->link_attributes(0, 3, GL_FLOAT, 6 * sizeof(GLfloat), nullptr);
-    vao_plain->link_attributes(1, 3, GL_FLOAT, 6 * sizeof(GLfloat), (void *) (3 * sizeof(GLfloat)));
-
     auto vao_bushes = new VAO(VBO{bushes, 6});
-    vao_bushes->link_attributes(0, 3, GL_FLOAT, 6 * sizeof(GLfloat), nullptr);
-    vao_bushes->link_attributes(1, 3, GL_FLOAT, 6 * sizeof(GLfloat), (void *) (3 * sizeof(GLfloat)));
-
     auto vao_tree = new VAO(VBO{tree, 6});
-    vao_tree->link_attributes(0, 3, GL_FLOAT, 6 * sizeof(GLfloat), nullptr);
-    vao_tree->link_attributes(1, 3, GL_FLOAT, 6 * sizeof(GLfloat), (void *) (3 * sizeof(GLfloat)));
-
     auto vao_gift = new VAO(VBO{gift, 6});
-    vao_gift->link_attributes(0, 3, GL_FLOAT, 6 * sizeof(GLfloat), nullptr);
-    vao_gift->link_attributes(1, 3, GL_FLOAT, 6 * sizeof(GLfloat), (void *) (3 * sizeof(GLfloat)));
+    {
+        vao_sphere->link_attributes(0, 3, GL_FLOAT, 6 * sizeof(GLfloat), nullptr);
+        vao_sphere->link_attributes(1, 3, GL_FLOAT, 6 * sizeof(GLfloat), (void *) (3 * sizeof(GLfloat)));
+
+        vao_suzi->link_attributes(0, 3, GL_FLOAT, 6 * sizeof(GLfloat), nullptr);
+        vao_suzi->link_attributes(1, 3, GL_FLOAT, 6 * sizeof(GLfloat), (void *) (3 * sizeof(GLfloat)));
+
+        vao_plain->link_attributes(0, 3, GL_FLOAT, 6 * sizeof(GLfloat), nullptr);
+        vao_plain->link_attributes(1, 3, GL_FLOAT, 6 * sizeof(GLfloat), (void *) (3 * sizeof(GLfloat)));
+
+        vao_bushes->link_attributes(0, 3, GL_FLOAT, 6 * sizeof(GLfloat), nullptr);
+        vao_bushes->link_attributes(1, 3, GL_FLOAT, 6 * sizeof(GLfloat), (void *) (3 * sizeof(GLfloat)));
+
+        vao_tree->link_attributes(0, 3, GL_FLOAT, 6 * sizeof(GLfloat), nullptr);
+        vao_tree->link_attributes(1, 3, GL_FLOAT, 6 * sizeof(GLfloat), (void *) (3 * sizeof(GLfloat)));
+
+        vao_gift->link_attributes(0, 3, GL_FLOAT, 6 * sizeof(GLfloat), nullptr);
+        vao_gift->link_attributes(1, 3, GL_FLOAT, 6 * sizeof(GLfloat), (void *) (3 * sizeof(GLfloat)));
+    }
 
     // materials
     auto material_yellow = new Material{glm::vec3(255.f, 255.f, 0.f) / 255.f};
@@ -80,83 +83,19 @@ int main() {
     auto model_bushes = new Model{"model_bushes", vao_bushes};
     auto model_gift = new Model{"model_gift", vao_gift};
 
+    auto *light_1_render_obj = new RenderObject{model_sphere, shader_constant, material_yellow};
+    light_1->set_render_object(light_1_render_obj);
 
-    auto *light_render_obj = new RenderObject{model_sphere, shader_constant, material_yellow};
-    light->set_render_object(light_render_obj);
+    auto *light_2_render_obj = new RenderObject{model_sphere, shader_constant, material_yellow};
+    light_2->set_render_object(light_2_render_obj);
 
-    // scene 1
-    auto sphere1 = new RenderObject{model_sphere, shader_blinn, material_blue};
-    sphere1->get_transform()->set_position(glm::vec3(2.f, 0.f, 0.f));
-    auto sphere2 = new RenderObject{model_sphere, shader_blinn, material_blue};
-    sphere2->get_transform()->set_position(glm::vec3(-2.f, 0.f, 0.f));
-    auto sphere3 = new RenderObject{model_sphere, shader_blinn, material_blue};
-    sphere3->get_transform()->set_position(glm::vec3(0.f, 2.f, 0.f));
-    auto sphere4 = new RenderObject{model_sphere, shader_blinn, material_blue};
-    sphere4->get_transform()->set_position(glm::vec3(0.f, -2.f, 0.f));
 
-    auto scene_1 = new Scene{"scene_1", {light_render_obj, sphere1, sphere2, sphere3, sphere4}, {}};
-    scene_1->set_on_create([&camera, &light, &light_render_obj]() {
-        camera->set_position(glm::vec3(0.f, 0.f, 6.f));
-        camera->set_pitch_yaw(0.f, 0.f);
-        light->set_position(glm::vec3(0.f, 0.f, 0.f));
-        light_render_obj->get_transform()->scale(0.3);
-    });
-
-    // scene 2
-    auto sun = new RenderObject{model_sphere, shader_constant, material_yellow};
-
-    auto mars_pivot = new TransformComposite{};
-    sun->set_transform(sun->get_transform()->attach(mars_pivot));
-    auto mars = new RenderObject{model_sphere, shader_blinn, material_red};
-    mars_pivot->attach(mars->get_transform());
-
-    auto earth_pivot = new TransformComposite{};
-    sun->set_transform(sun->get_transform()->attach(earth_pivot));
-    auto earth = new RenderObject{model_sphere, shader_blinn, material_blue};
-    earth_pivot->attach(earth->get_transform());
-
-    auto moon_pivot = new TransformComposite{};
-    earth->set_transform(earth->get_transform()->attach(moon_pivot));
-    auto moon = new RenderObject{model_sphere, shader_blinn, material_grey};
-    moon_pivot->attach(moon->get_transform());
-
-    mars->get_transform()->set_position(glm::vec3(0.f, 4.f, 0.f));
-    mars->get_transform()->scale(0.6f);
-
-    earth->get_transform()->set_position(glm::vec3(3.f, 0.f, 0.f));
-    earth->get_transform()->scale(0.5f);
-
-    moon->get_transform()->set_position(glm::vec3(2.f, 0.f, 0.f));
-    moon->get_transform()->scale(0.5f);
-
-    auto scene_2 = new Scene{"scene_2", {light_render_obj, sun, mars, earth, moon},
-                             {earth_pivot, moon_pivot, mars_pivot}};
-    scene_2->set_on_create([&light]() {
-        light->set_position(glm::vec3(0.f, 0.f, 0.f));
-    });
-    scene_2->set_on_update([&mars_pivot, &moon_pivot, &earth_pivot]() {
-        mars_pivot->rotate(glm::vec3(0.f, 0.f, 1.f));
-        earth_pivot->rotate(glm::vec3(0.f, 1.f, 0.f));
-        moon_pivot->rotate(glm::vec3(0.f, 0.f, 1.f));
-    });
-
-    // scene 3
-    auto sphere_scene_3 = new RenderObject{model_sphere, shader_phong, material_blue};
-    auto scene_3 = new Scene{"scene_3", {light_render_obj, sphere_scene_3}, {}};
-    scene_3->set_on_create([&camera, &light, &light_render_obj, &sphere_scene_3]() {
-        camera->set_position(glm::vec3(0.f, -5.f, 0.f));
-        camera->set_pitch_yaw(90.f, 0.f);
-        light->set_position(glm::vec3(0.f, 5.f, 0.f));
-        light_render_obj->get_transform()->scale(0.3);
-        sphere_scene_3->get_material()->set_shininess(1.f);
-    });
-
-    // scene 5
-    auto render_objects = std::vector<RenderObject *>{light_render_obj};
+    auto render_objects = std::vector<RenderObject *>{light_1_render_obj, light_2_render_obj};
 
     auto floor = new RenderObject{model_plain, shader_blinn, material_green};
     render_objects.push_back(floor);
     floor->get_transform()->scale(1000.f);
+    floor->get_material()->set_specular_strength(0.f);
 
     float max_x = 30.f;
     float max_z = 30.f;
@@ -198,33 +137,32 @@ int main() {
         }
     }
 
-    auto scene_5 = new Scene{"scene_5", render_objects, {}};
-    scene_5->set_on_create([&camera, &light, &light_render_obj]() {
+    auto scene = new Scene{"scene_5", render_objects, {}};
+    scene->set_on_create([&camera, &light_1, &light_2]() {
         camera->set_position(glm::vec3(0.f, 0.f, 6.f));
-        camera->set_pitch_yaw(0.f, 0.f);
-        light->set_position(glm::vec3(0.f, 10.f, 0.f));
-        light_render_obj->get_transform()->scale(0.3);
+        light_1->set_position(glm::vec3(0.f, 10.f, 0.f));
+        light_2->set_position(glm::vec3(5.f, 10.f, 0.f));
     });
 
     // inputs
     {
-        input_manager.register_key_down_callback(GLFW_KEY_UP, [&light]() {
-            light->move(glm::vec3(0.0f, 0.0f, .1f));
+        input_manager.register_key_down_callback(GLFW_KEY_UP, [&light_1]() {
+            light_1->move(glm::vec3(0.0f, 0.0f, .1f));
         });
-        input_manager.register_key_down_callback(GLFW_KEY_DOWN, [&light]() {
-            light->move(glm::vec3(0.0f, 0.0f, -.1f));
+        input_manager.register_key_down_callback(GLFW_KEY_DOWN, [&light_1]() {
+            light_1->move(glm::vec3(0.0f, 0.0f, -.1f));
         });
-        input_manager.register_key_down_callback(GLFW_KEY_LEFT, [&light]() {
-            light->move(glm::vec3(-.1f, 0.0f, 0.0f));
+        input_manager.register_key_down_callback(GLFW_KEY_LEFT, [&light_1]() {
+            light_1->move(glm::vec3(-.1f, 0.0f, 0.0f));
         });
-        input_manager.register_key_down_callback(GLFW_KEY_RIGHT, [&light]() {
-            light->move(glm::vec3(.1f, 0.0f, 0.0f));
+        input_manager.register_key_down_callback(GLFW_KEY_RIGHT, [&light_1]() {
+            light_1->move(glm::vec3(.1f, 0.0f, 0.0f));
         });
-        input_manager.register_key_down_callback(GLFW_KEY_PAGE_UP, [&light]() {
-            light->move(glm::vec3(0.0f, .1f, 0.0f));
+        input_manager.register_key_down_callback(GLFW_KEY_PAGE_UP, [&light_1]() {
+            light_1->move(glm::vec3(0.0f, .1f, 0.0f));
         });
-        input_manager.register_key_down_callback(GLFW_KEY_PAGE_DOWN, [&light]() {
-            light->move(glm::vec3(0.0f, -.1f, 0.0f));
+        input_manager.register_key_down_callback(GLFW_KEY_PAGE_DOWN, [&light_1]() {
+            light_1->move(glm::vec3(0.0f, -.1f, 0.0f));
         });
 
         input_manager.register_key_down_callback(GLFW_KEY_W, [&camera]() {
@@ -265,5 +203,5 @@ int main() {
         });
     }
 
-    scene_5->play();
+    scene->play();
 }
