@@ -11,7 +11,8 @@ class Scene {
 public:
     Scene(std::string name, const std::vector<RenderObject *> &render_objects);
 
-    Scene(std::string name, const std::vector<RenderObject *> &render_objects, std::vector<Transform *> transforms);
+    Scene(std::string name, const std::vector<RenderObject *> &render_objects,
+          std::vector<Transform *> objectless_transforms);
 
     ~Scene();
 

@@ -12,9 +12,9 @@ Transform *TransformLeaf::attach(Transform *child) {
         this->parent->detach(this);
     }
 
-    composite->set_position(this->position);
-    composite->set_rotation(this->rotation);
-    composite->set_scale(this->measure);
+    composite->set_position(this->local_position);
+    composite->set_rotation(this->local_rotation);
+    composite->set_scale(this->local_measure);
 
     return composite;
 }

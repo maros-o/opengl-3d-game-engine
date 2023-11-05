@@ -6,6 +6,7 @@
 #include "Observer/Observer.h"
 #include "Observer/Observable.h"
 #include "Observer/ObserverEvents.h"
+#include "Transform/TransformComposite.h"
 
 const float FOV = 60.0f;
 const float SPEED = 0.1f;
@@ -32,6 +33,8 @@ public:
 
     [[nodiscard]] glm::vec3 get_position() const;
 
+    [[nodiscard]] glm::vec3 get_euler_angles() const;
+
     void set_position(glm::vec3 position);
 
     void set_pitch_yaw(float pitch, float yaw);
@@ -42,6 +45,8 @@ public:
 
     void window_resize(int new_width, int new_height);
 
+    [[nodiscard]] TransformComposite *get_transform_mount() const;
+
 private:
     int width, height;
 
@@ -51,9 +56,11 @@ private:
     glm::vec3 up{glm::vec3(0.0f, 1.0f, 0.0f)};
     glm::vec3 right{glm::vec3(1.0f, 0.0f, 0.0f)};
 
+    TransformComposite *transform_mount = new TransformComposite();
+
     float speed = SPEED;
     float sensitivity = SENSITIVITY;
 
     float pitch = 0.0f;
-    float yaw = 0.0f;
+    float yaw = -90.0f;
 };

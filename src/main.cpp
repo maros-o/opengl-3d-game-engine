@@ -5,7 +5,8 @@
 #include "Renderer.h"
 #include "Model.h"
 #include "Camera.h"
-#include "Light.h"
+#include "Light/PointLight.h"
+#include "Light/DirectionalLight.h"
 #include "InputManager.h"
 #include "Scene.h"
 #include "../include/Transform/TransformComposite.h"
@@ -19,6 +20,7 @@
 #include "../res/3d_models/gift.h"
 #include "../res/3d_models/bushes.h"
 #include "../res/3d_models/tree.h"
+#include "Light/SpotLight.h"
 
 static float random_normalized_float() {
     static std::random_device rd;
@@ -34,13 +36,16 @@ int main() {
 
     auto camera = new Camera(context.get_screen_width(), context.get_screen_height());
 
-    auto light_1 = new Light();
-    auto light_2 = new Light();
-
+    auto light_1 = new PointLight();
+    auto light_2 = new PointLight();
+    auto dir_light_1 = new DirectionalLight();
+    auto spot_light_1 = new SpotLight();
+    spot_light_1->set_cut_off(0.95f);
 
     // shaders
     auto shader_constant = new ShaderProgram{"../shaders/constant.glsl", camera};
-    auto shader_blinn = new ShaderProgram{"../shaders/blinn.glsl", camera, {light_1, light_2}};
+    auto shader_blinn = new ShaderProgram{"../shaders/blinn.glsl", camera,
+                                          {spot_light_1}};
 
     // vaos
     auto vao_sphere = new VAO(VBO{sphere, 6});
@@ -83,14 +88,16 @@ int main() {
     auto model_bushes = new Model{"model_bushes", vao_bushes};
     auto model_gift = new Model{"model_gift", vao_gift};
 
-    auto *light_1_render_obj = new RenderObject{model_sphere, shader_constant, material_yellow};
-    light_1->set_render_object(light_1_render_obj);
+    auto *light_1_render_obj = new RenderObject{model_gift, shader_constant, material_yellow};
+    spot_light_1->get_transform()->attach(light_1_render_obj->get_transform());
+
+    spot_light_1->set_camera(camera);
 
     auto *light_2_render_obj = new RenderObject{model_sphere, shader_constant, material_yellow};
-    light_2->set_render_object(light_2_render_obj);
+    light_2->get_transform()->attach(light_2_render_obj->get_transform());
 
 
-    auto render_objects = std::vector<RenderObject *>{light_1_render_obj, light_2_render_obj};
+    auto render_objects = std::vector<RenderObject *>{light_2_render_obj};
 
     auto floor = new RenderObject{model_plain, shader_blinn, material_green};
     render_objects.push_back(floor);
@@ -137,12 +144,17 @@ int main() {
         }
     }
 
-    auto scene = new Scene{"scene_5", render_objects, {}};
-    scene->set_on_create([&camera, &light_1, &light_2]() {
-        camera->set_position(glm::vec3(0.f, 0.f, 6.f));
-        light_1->set_position(glm::vec3(0.f, 10.f, 0.f));
-        light_2->set_position(glm::vec3(5.f, 10.f, 0.f));
+    auto scene = new Scene{"scene_5", render_objects,
+                           {camera->get_transform_mount()}};
+    scene->set_on_create([&camera, &spot_light_1, &light_2, &light_1]() {
+        camera->set_position(glm::vec3(0.f, 5.f, 0.f));
+        spot_light_1->set_position(glm::vec3(0.f, 0.f, -1.f));
+        light_2->set_position(glm::vec3(0.f, 10.f, 0.f));
     });
+    scene->set_on_update([&camera, &light_1, &light_2]() {
+
+    });
+
 
     // inputs
     {

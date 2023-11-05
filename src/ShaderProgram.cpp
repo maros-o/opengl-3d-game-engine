@@ -1,5 +1,7 @@
 #include "ShaderProgram.h"
 #include "buffers/SSBO.h"
+#include "Light/DirectionalLight.h"
+#include "Light/SpotLight.h"
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -126,7 +128,9 @@ ShaderProgram::~ShaderProgram() {
 
 void ShaderProgram::use() const {
     glUseProgram(this->id);
-    this->ssbo_lights.bind_base();
+    this->ssbo_directional_lights.bind_base();
+    this->ssbo_point_lights.bind_base();
+    this->ssbo_spot_lights.bind_base();
 }
 
 void ShaderProgram::reset() {
@@ -205,9 +209,7 @@ void ShaderProgram::update(int event) {
         case (int) CameraEvent::POSITION:
             this->set_uniform(ShaderUniform::CAMERA_WORLD_POSITION, this->camera->get_position());
             return;
-        case (int) LightEvent::POSITION:
-        case (int) LightEvent::COLOR:
-        case (int) LightEvent::STRENGTH:
+        case (int) LightEvent::ALL:
             this->update_ssbo_lights();
             return;
         default:
@@ -215,26 +217,75 @@ void ShaderProgram::update(int event) {
     }
 }
 
-struct LightSSBO {
-    glm::vec4 world_position;   // 16 bytes
-    glm::vec4 color;            // 16 bytes
-    float constant_strength;    // 4 bytes
-    float linear_strength;      // 4 bytes
-    float quadratic_strength;   // 4 bytes
-    float padding_1;            // 4 bytes
-};                              // 48 bytes (multiple of 4, 8, 16)
+struct DirectionalLightSSBO {
+    glm::vec4 direction;        // 16
+    glm::vec4 color;            // 16
+    float strength;             // 4
+    float padding_1;            // 4
+    float padding_2;            // 4
+    float padding_3;            // 4
+};                              // 48 bytes
+
+struct PointLightSSBO {
+    glm::vec4 world_position;   // 16
+    glm::vec4 color;            // 16
+    float constant_strength;    // 4
+    float linear_strength;      // 4
+    float quadratic_strength;   // 4
+    float padding_1;            // 4
+};                              // 48 bytes
+
+struct SpotLightSSBO {
+    glm::vec4 world_position;   // 16
+    glm::vec4 color;            // 16
+    glm::vec4 direction;        // 16
+    float constant_strength;    // 4
+    float linear_strength;      // 4
+    float quadratic_strength;   // 4
+    float cut_off;            // 4
+};                              // 64 bytes
 
 void ShaderProgram::update_ssbo_lights() {
-    std::vector<LightSSBO> lights_ssbo_data;
+    std::vector<DirectionalLightSSBO> directional_lights_ssbo_data;
+    std::vector<PointLightSSBO> point_lights_ssbo_data;
+    std::vector<SpotLightSSBO> spot_lights_ssbo_data;
+
     for (auto light: this->lights) {
-        lights_ssbo_data.push_back({
-                                           glm::vec4(light->get_position(), 1.f),
-                                           glm::vec4(light->get_color(), 1.f),
-                                           light->get_constant_strength(),
-                                           light->get_linear_strength(),
-                                           light->get_quadratic_strength(),
-                                           0.f
-                                   });
+        if (auto dir_light = dynamic_cast<DirectionalLight *>(light)) {
+            directional_lights_ssbo_data.push_back({
+                                                           glm::vec4(dir_light->get_direction(), 1.0f),
+                                                           glm::vec4(dir_light->get_color(), 1.0f),
+                                                           dir_light->get_strength(),
+                                                           0.0f,
+                                                           0.0f,
+                                                           0.0f,
+                                                   });
+        } else if (auto spot_light = dynamic_cast<SpotLight *>(light)) {
+            spot_lights_ssbo_data.push_back({
+                                                    glm::vec4(spot_light->get_position(), 1.0f),
+                                                    glm::vec4(spot_light->get_color(), 1.0f),
+                                                    glm::vec4(spot_light->get_direction(), 1.0f),
+                                                    spot_light->get_constant_strength(),
+                                                    spot_light->get_linear_strength(),
+                                                    spot_light->get_quadratic_strength(),
+                                                    spot_light->get_cut_off(),
+                                            });
+        } else if (auto point_light = dynamic_cast<PointLight *>(light)) {
+            point_lights_ssbo_data.push_back({
+                                                     glm::vec4(point_light->get_position(), 1.0f),
+                                                     glm::vec4(point_light->get_color(), 1.0f),
+                                                     point_light->get_constant_strength(),
+                                                     point_light->get_linear_strength(),
+                                                     point_light->get_quadratic_strength(),
+                                                     0.0f,
+                                             });
+        }
     }
-    this->ssbo_lights.allocate_data(lights_ssbo_data.size() * sizeof(LightSSBO), lights_ssbo_data.data());
+
+    this->ssbo_directional_lights.allocate_data(directional_lights_ssbo_data.size() * sizeof(DirectionalLightSSBO),
+                                                directional_lights_ssbo_data.data());
+    this->ssbo_point_lights.allocate_data(point_lights_ssbo_data.size() * sizeof(PointLightSSBO),
+                                          point_lights_ssbo_data.data());
+    this->ssbo_spot_lights.allocate_data(spot_lights_ssbo_data.size() * sizeof(SpotLightSSBO),
+                                         spot_lights_ssbo_data.data());
 }

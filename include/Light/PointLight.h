@@ -3,16 +3,18 @@
 #include "Observer/Observer.h"
 #include "Observer/Observable.h"
 #include "glm/glm.hpp"
+#include "Light.h"
+#include "Transform/Transform.h"
+#include "Transform/TransformLeaf.h"
+#include "Camera.h"
 
 class RenderObject;
 
-class Light : public Observable {
+class PointLight : public Light, Observer {
 public:
-    Light() = default;
+    PointLight() = default;
 
     void move(const glm::vec3 &offset);
-
-    void set_render_object(RenderObject *render_object);
 
     void set_position(const glm::vec3 &new_position);
 
@@ -24,7 +26,11 @@ public:
 
     void set_quadratic_strength(float new_quadratic_strength);
 
+    void set_camera(Camera *new_camera);
+
     [[nodiscard]]  glm::vec3 get_position() const;
+
+    [[nodiscard]] TransformComposite *get_transform() const;
 
     [[nodiscard]]  glm::vec3 get_color() const;
 
@@ -34,15 +40,16 @@ public:
 
     [[nodiscard]]  float get_quadratic_strength() const;
 
+    void update(int event) override;
 
-private:
-    glm::vec3 position{glm::vec3(0.0f, 0.0f, 0.0f)};
+
+protected:
     glm::vec3 color{glm::vec3(1.0f, 1.0f, 1.0f)};
+
+    TransformComposite *transform = new TransformComposite();
+    Camera *camera = nullptr;
 
     float constant_strength = 1.0f;
     float linear_strength = 0.008f;
     float quadratic_strength = 0.0032f;
-
-    RenderObject *render_object = nullptr;
 };
-

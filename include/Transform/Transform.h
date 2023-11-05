@@ -19,7 +19,25 @@ public:
 
     Transform *set_rotation(glm::vec3 new_rotation);
 
+    Transform *set_rotation_x(float new_rotation_x);
+
+    Transform *set_rotation_y(float new_rotation_y);
+
     Transform *set_scale(glm::vec3 new_scale);
+
+    Transform *set_scale(float new_scale);
+
+    [[nodiscard]] glm::vec3 get_local_position() const;
+
+    [[nodiscard]] glm::vec3 get_local_rotation() const;
+
+    [[nodiscard]] glm::vec3 get_local_scale() const;
+
+    [[nodiscard]] glm::vec3 get_world_position();
+
+    [[nodiscard]] glm::vec3 get_world_rotation();
+
+    [[nodiscard]] glm::vec3 get_world_scale();
 
     virtual void update_parent_model_matrix() = 0;
 
@@ -31,17 +49,19 @@ public:
 
     void set_parent(Transform *parent);
 
+    void set_parent_matrix(glm::mat4 new_parent_model_matrix);
+
 protected:
     Transform *parent = nullptr;
-    
+
     glm::mat4 local_model_matrix = glm::mat4(1.0f);
     glm::mat4 parent_model_matrix = glm::mat4(1.0f);
 
     bool local_model_matrix_needs_update = true;
 
-    glm::vec3 position{glm::vec3(0.0f, 0.0f, 0.0f)};
-    glm::vec3 rotation{glm::vec3(0.0f, 0.0f, 0.0f)};
-    glm::vec3 measure{glm::vec3(1.0f, 1.0f, 1.0f)};
+    glm::vec3 local_position{glm::vec3(0.0f, 0.0f, 0.0f)};
+    glm::vec3 local_rotation{glm::vec3(0.0f, 0.0f, 0.0f)};
+    glm::vec3 local_measure{glm::vec3(1.0f, 1.0f, 1.0f)};
 
     void clamp_rotation();
 

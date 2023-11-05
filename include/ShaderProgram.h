@@ -11,7 +11,7 @@
 #include <map>
 
 #include "Camera.h"
-#include "Light.h"
+#include "Light/PointLight.h"
 #include "buffers/SSBO.h"
 
 enum class ShaderUniform {
@@ -62,7 +62,9 @@ private:
     Camera *camera = nullptr;
 
     std::vector<Light *> lights;
-    SSBO ssbo_lights{0};
+    SSBO ssbo_directional_lights{0};
+    SSBO ssbo_point_lights{1};
+    SSBO ssbo_spot_lights{2};
 
     void destroy() const;
 

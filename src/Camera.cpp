@@ -1,7 +1,10 @@
 
 #include "Camera.h"
+#include "glm/detail/type_quat.hpp"
+#include "glm/gtc/quaternion.hpp"
 #include <algorithm>
 #include <glm/gtc/matrix_transform.hpp>
+#include <iostream>
 
 
 Camera::Camera(int width, int height) : width(width), height(height) {}
@@ -36,6 +39,7 @@ void Camera::move(CameraMovement direction) {
             break;
     }
 
+    this->transform_mount->set_position(this->position);
     this->notify((int) CameraEvent::POSITION);
     this->notify((int) CameraEvent::VIEW);
 }
@@ -50,10 +54,15 @@ void Camera::rotate(unsigned short mouse_x, unsigned short mouse_y) {
     this->yaw += offset_x;
     this->pitch -= offset_y;
 
+    if (this->yaw > 360.0f) {
+        this->yaw -= 360.0f;
+    } else if (this->yaw < 0.0f) {
+        this->yaw += 360.0f;
+    }
+
     if (this->pitch > 89.0f) {
         this->pitch = 89.0f;
-    }
-    if (this->pitch < -89.0f) {
+    } else if (this->pitch < -89.0f) {
         this->pitch = -89.0f;
     }
 
@@ -65,6 +74,8 @@ void Camera::rotate(unsigned short mouse_x, unsigned short mouse_y) {
     this->front = glm::normalize(new_front);
     this->right = glm::normalize(glm::cross(this->front, this->world_up));
     this->up = glm::normalize(glm::cross(this->right, this->front));
+
+    this->transform_mount->set_rotation(-glm::degrees(this->get_euler_angles()));
 
     this->notify((int) CameraEvent::POSITION);
     this->notify((int) CameraEvent::VIEW);
@@ -84,6 +95,7 @@ glm::vec3 Camera::get_position() const {
 void Camera::set_position(glm::vec3 new_position) {
     this->position = new_position;
 
+    this->transform_mount->set_position(this->position);
     this->notify((int) CameraEvent::VIEW);
     this->notify((int) CameraEvent::POSITION);
 }
@@ -94,3 +106,16 @@ void Camera::set_pitch_yaw(float new_pitch, float new_yaw) {
 
     this->notify((int) CameraEvent::VIEW);
 }
+
+TransformComposite *Camera::get_transform_mount() const {
+    return this->transform_mount;
+}
+
+glm::vec3 Camera::get_euler_angles() const {
+    auto matrix = glm::mat3(this->get_view_matrix());
+    
+    glm::quat quat_cast = glm::quat_cast(matrix);
+    glm::vec3 euler_angles = glm::eulerAngles(quat_cast);
+    return euler_angles;
+}
+

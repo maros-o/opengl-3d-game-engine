@@ -5,7 +5,5 @@ enum class CameraEvent : int {
 };
 
 enum class LightEvent : int {
-    POSITION = 101,
-    COLOR = 102,
-    STRENGTH = 103,
+    ALL = 100,
 };
