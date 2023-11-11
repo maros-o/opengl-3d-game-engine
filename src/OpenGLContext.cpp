@@ -1,21 +1,30 @@
+#include <map>
 #include "OpenGLContext.h"
+#include <iostream>
 
 OpenGLContext OpenGLContext::instance;
 
-static void GLAPIENTRY
-message_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message,
-                 const void *user_param) {
+std::map<GLenum, std::string> severity_map = {
+        {GL_DEBUG_SEVERITY_HIGH,         "SEVERITY_HIGH"},
+        {GL_DEBUG_SEVERITY_MEDIUM,       "SEVERITY_MEDIUM"},
+        {GL_DEBUG_SEVERITY_LOW,          "SEVERITY_LOW"},
+        {GL_DEBUG_SEVERITY_NOTIFICATION, "NOTIFICATION"},
+};
+
+void message_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message,
+                      const void *user_param) {
     const char *source_str = "UNKNOWN";
     const char *type_str = "UNKNOWN";
+    std::string severity_str = "UNKNOWN";
 
     if (source == GL_DEBUG_SOURCE_API) {
         source_str = "API";
     } else if (source == GL_DEBUG_SOURCE_WINDOW_SYSTEM) {
-        source_str = "WINDOW SYSTEM";
+        source_str = "WINDOW_SYSTEM";
     } else if (source == GL_DEBUG_SOURCE_SHADER_COMPILER) {
-        source_str = "SHADER COMPILER";
+        source_str = "SHADER_COMPILER";
     } else if (source == GL_DEBUG_SOURCE_THIRD_PARTY) {
-        source_str = "THIRD PARTY";
+        source_str = "THIRD_PARTY";
     } else if (source == GL_DEBUG_SOURCE_APPLICATION) {
         source_str = "APPLICATION";
     } else if (source == GL_DEBUG_SOURCE_OTHER) {
@@ -42,11 +51,15 @@ message_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei
         type_str = "OTHER";
     }
 
-    fprintf(stderr, "%s::OPENGL::%s::0x%X: %s\n", type_str, source_str,
-            severity,
-            message);
-
-    exit(1);
+    if (severity_map.find(severity) != severity_map.end()) {
+        severity_str = severity_map[severity];
+    }
+    if (severity == GL_DEBUG_SEVERITY_NOTIFICATION) {
+        std::cout << "\x1b[90;1m" << type_str << "::" << source_str << "::" << severity_str << ": " << message
+                  << "\x1b[0m" << std::endl;
+    } else {
+        std::cerr << type_str << "::OPENGL::" << source_str << "::" << severity_str << ": " << message << std::endl;
+    }
 }
 
 OpenGLContext::~OpenGLContext() {
@@ -104,14 +117,14 @@ OpenGLContext &OpenGLContext::get_instance() {
 
 OpenGLContext &OpenGLContext::init(int screen_width, int screen_height, const char *title) {
     if (!glfwInit()) {
-        fprintf(stderr, "ERROR: could not start GLFW3\n");
+        fprintf(stderr, "ERROR::GLFW3::INIT\n");
         exit(EXIT_FAILURE);
     }
 
     this->window = glfwCreateWindow(screen_width, screen_height, title, nullptr, nullptr);
     if (!this->window) {
         glfwTerminate();
-        fprintf(stderr, "ERROR: could not open window with GLFW3\n");
+        fprintf(stderr, "ERROR::GLFW3::WINDOW\n");
         exit(EXIT_FAILURE);
     }
 
@@ -120,7 +133,7 @@ OpenGLContext &OpenGLContext::init(int screen_width, int screen_height, const ch
 
     glewExperimental = GL_TRUE;
     if (glewInit() != GLEW_OK) {
-        fprintf(stderr, "ERROR: could not start GLEW\n");
+        fprintf(stderr, "ERROR::GLEW::INIT\n");
         exit(EXIT_FAILURE);
     }
 

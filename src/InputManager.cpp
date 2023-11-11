@@ -24,6 +24,20 @@ InputManager &InputManager::init() {
         }
     });
 
+    glfwSetMouseButtonCallback(window, [](GLFWwindow *window, int key, int action, int mods) {
+        auto *input_manager = static_cast<InputManager *>(glfwGetWindowUserPointer(window));
+
+        if (action == GLFW_PRESS) {
+            input_manager->pressed_keys.insert(key);
+
+            for (const auto &callback: input_manager->key_press_callbacks[key]) {
+                callback();
+            }
+        } else if (action == GLFW_RELEASE) {
+            input_manager->pressed_keys.erase(key);
+        }
+    });
+
     glfwSetCursorPosCallback(window, [](GLFWwindow *window, double pos_x, double pos_y) {
         auto *input_manager = static_cast<InputManager *>(glfwGetWindowUserPointer(window));
 

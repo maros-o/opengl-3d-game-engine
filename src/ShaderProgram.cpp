@@ -46,7 +46,7 @@ static ShaderProgramSource parse_shader(const char *file_path) {
     std::stringstream ss[2];
     ShaderType type = ShaderType::NONE;
     while (getline(file_stream, line)) {
-        if (line.find("#shader") != std::string::npos) {
+        if (line.find("// #shader") != std::string::npos) {
             if (line.find("vertex") != std::string::npos) {
                 type = ShaderType::VERTEX;
             } else if (line.find("fragment") != std::string::npos) {

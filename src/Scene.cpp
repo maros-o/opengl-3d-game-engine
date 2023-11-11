@@ -38,6 +38,12 @@ void Scene::play() {
         }
 
         Renderer::clear();
+
+        if (this->sky_box != nullptr) {
+            this->renderer->render_object(sky_box);
+            Renderer::clear_depth();
+        }
+
         this->renderer->render_objects();
 
         context.swap_buffers();
@@ -54,4 +60,8 @@ void Scene::set_on_update(std::function<void()> new_on_update) {
 
 void Scene::stop() {
     this->is_playing = false;
+}
+
+void Scene::set_sky_box(RenderObject *new_sky_box) {
+    this->sky_box = new_sky_box;
 }

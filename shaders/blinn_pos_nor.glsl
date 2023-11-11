@@ -1,12 +1,12 @@
-#shader vertex
-#version 450 core
+// #shader vertex
+#version 460 core
 
 uniform mat4 u_model_matrix;
 uniform mat4 u_view_matrix;
 uniform mat4 u_projection_matrix;
 
-layout(location = 0) in vec3 l_local_position;
-layout(location = 1) in vec3 l_local_normal;
+layout (location = 0) in vec3 l_local_position;
+layout (location = 1) in vec3 l_local_normal;
 
 out vec4 v_world_position;
 out vec3 v_world_normal;
@@ -19,8 +19,8 @@ void main(void) {
 }
 
 
-#shader fragment
-#version 450 core
+// #shader fragment
+#version 460 core
 
 // lights
 struct DirectionalLight {
@@ -49,13 +49,13 @@ struct SpotLightSSBO {
     float cut_off;
 };
 
-layout(std430, binding = 0) buffer DirectionalLightsSSBO {
+layout (std430, binding = 0) buffer DirectionalLightsSSBO {
     DirectionalLight directional_lights[];
 };
-layout(std430, binding = 1) buffer PointLightsSSBO {
+layout (std430, binding = 1) buffer PointLightsSSBO {
     PointLight point_lights[];
 };
-layout(std430, binding = 2) buffer SpotLightsSSBO {
+layout (std430, binding = 2) buffer SpotLightsSSBO {
     SpotLightSSBO spot_lights[];
 };
 

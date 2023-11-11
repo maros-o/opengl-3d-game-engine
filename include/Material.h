@@ -9,6 +9,8 @@ public:
 
     explicit Material(glm::vec3 object_color) : object_color(object_color) {};
 
+    explicit Material(Texture *texture) : texture(texture) {};
+
     Material(glm::vec3 object_color, float ambient_strength, float diffuse_strength, float specular_strength,
              float shininess) :
             object_color(object_color), ambient_strength(ambient_strength), diffuse_strength(diffuse_strength),
@@ -32,6 +34,10 @@ public:
 
     [[nodiscard]] inline float get_shininess() const {
         return this->shininess;
+    }
+
+    [[nodiscard]] inline Texture *get_texture() const {
+        return this->texture;
     }
 
     inline void set_object_color(glm::vec3 new_object_color) {
@@ -65,7 +71,9 @@ public:
 private:
     glm::vec3 object_color{glm::vec3(1.0f, 1.0f, 1.0f)};
 
-    float ambient_strength = 0.1f;
+    Texture *texture = nullptr;
+
+    float ambient_strength = 0.3f;
     float diffuse_strength = 0.5f;
     float specular_strength = 1.0f;
     float shininess = 32.0f;

@@ -26,10 +26,13 @@ public:
 
     void set_on_update(std::function<void()> new_on_update);
 
+    void set_sky_box(RenderObject *sky_box);
+
 
 private:
     std::string name;
     Renderer *renderer;
+    RenderObject *sky_box = nullptr;
 
     bool is_playing = false;
 

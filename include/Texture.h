@@ -1,11 +1,14 @@
 #pragma once
 
 #include <string>
+#include <vector>
 #include "OpenGLContext.h"
 
 class Texture {
 public:
     explicit Texture(std::string file_path);
+
+    explicit Texture(const std::vector<std::string> &faces);
 
     ~Texture();
 
@@ -27,5 +30,6 @@ private:
     GLuint id = 0;
     int width = 0, height = 0, channels = 0;
     std::string file_path;
+    bool is_cube_map = false;
     unsigned char *local_buffer = nullptr;
 };

@@ -17,16 +17,10 @@ include_directories(res/3d_models)
 
 set(SOURCE_DIR src)
 file(GLOB SOURCE_FILES ${SOURCE_DIR}/*.cpp)
-add_library(proj_lib ${SOURCE_FILES}
-        src/SSBO.cpp
-        src/DirectionalLight.cpp
-        src/SpotLight.cpp)
+add_library(proj_lib ${SOURCE_FILES})
 
 add_executable(main src/main.cpp
-        include/buffers/SSBO.h
-        include/Light/Light.h
-        include/Light/DirectionalLight.h
-        include/Light/SpotLight.h
-)
+        res/3d_models/plain_texture.h
+        res/3d_models/sky_cube.h)
 
 target_link_libraries(main proj_lib glfw GLEW::GLEW -lGL ${ASSIMP_LIBRARIES})

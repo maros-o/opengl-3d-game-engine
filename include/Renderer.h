@@ -16,9 +16,15 @@ public:
 
     void render_objects();
 
+    void render_object(RenderObject *object);
+
     void render() const;
 
     static void clear();
+
+    static void clear_depth();
+
+    static void clear_color();
 
 private:
     std::unordered_map<std::string, std::vector<RenderObject *>> objects;
