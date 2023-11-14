@@ -13,14 +13,14 @@ include_directories(${ASSIMP_INCLUDE_DIRS})
 include_directories(include)
 include_directories(libs)
 include_directories(res)
-include_directories(res/3d_models)
+include_directories(res/models)
 
 set(SOURCE_DIR src)
 file(GLOB SOURCE_FILES ${SOURCE_DIR}/*.cpp)
 add_library(proj_lib ${SOURCE_FILES})
 
 add_executable(main src/main.cpp
-        res/3d_models/plain_texture.h
-        res/3d_models/sky_cube.h)
+        res/models/float_vectors/plain_texture.h
+        res/models/float_vectors/sky_cube.h)
 
 target_link_libraries(main proj_lib glfw GLEW::GLEW -lGL ${ASSIMP_LIBRARIES})

@@ -9,7 +9,7 @@ class VAO {
 public:
     explicit VAO(const VBO &vbo);
 
-    VAO(const VBO &vbo, EBO ebo);
+    VAO(const VBO &vbo, const EBO &ebo);
 
     ~VAO();
 

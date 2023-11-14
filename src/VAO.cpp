@@ -4,7 +4,7 @@ VAO::VAO(const VBO &vbo) : vbo(vbo) {
     glGenVertexArrays(1, &this->id);
 }
 
-VAO::VAO(const VBO &vbo, EBO ebo) : vbo(vbo), ebo(ebo) {
+VAO::VAO(const VBO &vbo, const EBO &ebo) : vbo(vbo), ebo(ebo) {
     glGenVertexArrays(1, &this->id);
 }
 
