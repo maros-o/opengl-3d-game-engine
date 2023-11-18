@@ -21,6 +21,8 @@ add_library(proj_lib ${SOURCE_FILES})
 
 add_executable(main src/main.cpp
         res/models/float_vectors/plain_texture.h
-        res/models/float_vectors/sky_cube.h)
+        res/models/float_vectors/sky_cube.h
+        include/ModelLoader.h
+        include/Utils.h)
 
 target_link_libraries(main proj_lib glfw GLEW::GLEW -lGL ${ASSIMP_LIBRARIES})

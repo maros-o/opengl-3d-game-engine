@@ -73,8 +73,8 @@ private:
 
     Texture *texture = nullptr;
 
-    float ambient_strength = 0.3f;
-    float diffuse_strength = 0.5f;
+    float ambient_strength = 0.5f;
+    float diffuse_strength = 0.8f;
     float specular_strength = 1.0f;
-    float shininess = 32.0f;
+    float shininess = 1.f;
 };

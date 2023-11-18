@@ -2,10 +2,14 @@
 
 #include <../libs/stb/stb_image.h>
 
-Texture::Texture(std::string file_path) : file_path(std::move(file_path)) {
+Texture::Texture(std::string file_path, float new_repeat) : file_path(std::move(file_path)) {
 
     stbi_set_flip_vertically_on_load(1);
     this->local_buffer = stbi_load(this->file_path.c_str(), &this->width, &this->height, &this->channels, 4);
+    if (!this->local_buffer) {
+        fprintf(stderr, "ERROR::TEXTURE::stbi_load('%s')\n", this->file_path.c_str());
+        exit(EXIT_FAILURE);
+    }
 
     glGenTextures(1, &this->id);
     this->bind();
@@ -15,12 +19,23 @@ Texture::Texture(std::string file_path) : file_path(std::move(file_path)) {
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D,
-                    GL_TEXTURE_WRAP_S,
-                    GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D,
-                    GL_TEXTURE_WRAP_T,
-                    GL_CLAMP_TO_EDGE);
+
+    if (new_repeat > -1.f) {
+        glTexParameteri(GL_TEXTURE_2D,
+                        GL_TEXTURE_WRAP_S,
+                        GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D,
+                        GL_TEXTURE_WRAP_T,
+                        GL_REPEAT);
+        this->repeat = new_repeat;
+    } else {
+        glTexParameteri(GL_TEXTURE_2D,
+                        GL_TEXTURE_WRAP_S,
+                        GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D,
+                        GL_TEXTURE_WRAP_T,
+                        GL_CLAMP_TO_EDGE);
+    }
 
     glGenerateMipmap(GL_TEXTURE_2D);
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
@@ -84,4 +99,8 @@ void Texture::unbind() {
 
 void Texture::destroy() {
     glDeleteTextures(1, &this->id);
+}
+
+float Texture::get_repeat() const {
+    return this->repeat;
 }

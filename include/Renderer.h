@@ -14,7 +14,7 @@ public:
 
     void add_object(RenderObject *object);
 
-    void render_objects();
+    void render_all_objects();
 
     void render_object(RenderObject *object);
 
@@ -32,4 +32,6 @@ private:
 
     GLsizei current_draw_count = 0;
     bool current_vao_has_ebo = false;
+
+    void render_single_object(RenderObject *object) const;
 };

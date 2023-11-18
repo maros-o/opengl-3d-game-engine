@@ -8,14 +8,14 @@
 
 class RenderObject {
 public:
-    explicit RenderObject(Model *model, ShaderProgram *shader, Material *material) : model(model), material(material),
-                                                                                     shader(shader) {};
+    explicit RenderObject(Model *model, ShaderProgram *shader, Material material) : model(model), material(material),
+                                                                                    shader(shader) {};
 
     Model *get_model();
 
     Transform *get_transform();
 
-    Material *get_material();
+    Material &get_material();
 
     ShaderProgram *get_shader();
 
@@ -23,7 +23,7 @@ public:
 
 private:
     Model *model;
-    Material *material;
+    Material material;
     ShaderProgram *shader;
     Transform *transform = new TransformLeaf();
 };

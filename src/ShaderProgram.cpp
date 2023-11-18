@@ -14,6 +14,7 @@ static std::unordered_map<ShaderUniform, std::string> ShaderUniformToString = {
         {ShaderUniform::PROJECTION_MATRIX,     "u_projection_matrix"},
         {ShaderUniform::NORMAL_MATRIX,         "u_normal_matrix"},
         {ShaderUniform::TEXTURE_SAMPLER,       "u_texture_sampler"},
+        {ShaderUniform::TEXTURE_REPEAT,        "u_texture_repeat"},
         {ShaderUniform::CAMERA_WORLD_POSITION, "u_camera_world_position"},
         {ShaderUniform::OBJECT_COLOR,          "u_object_color"},
         {ShaderUniform::OBJECT_AMBIENT,        "u_ambient_strength"},

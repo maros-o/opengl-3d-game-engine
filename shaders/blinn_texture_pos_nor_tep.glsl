@@ -74,6 +74,7 @@ uniform float u_shininess;
 
 // texture
 uniform sampler2D u_texture_sampler;
+uniform float u_texture_repeat;
 
 in vec4 v_world_position;
 in vec3 v_world_normal;
@@ -171,5 +172,6 @@ void main() {
         }
     }
 
-    fragColor = vec4(color_strength * u_object_color, 1.0f) * texture(u_texture_sampler, v_texture_position);
+    vec2 repeated_texture_pos = v_texture_position * u_texture_repeat;
+    fragColor = vec4(color_strength * u_object_color, 1.0f) * texture(u_texture_sampler, repeated_texture_pos);
 }

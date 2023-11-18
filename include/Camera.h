@@ -12,7 +12,7 @@ const float FOV = 60.0f;
 const float SPEED = 0.1f;
 const float SENSITIVITY = 50.0f;
 const float NEAR = 0.1f;
-const float FAR = 100.0f;
+const float FAR = 1000.0f;
 
 enum class CameraMovement {
     FORWARD,

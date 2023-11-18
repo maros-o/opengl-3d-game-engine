@@ -12,7 +12,7 @@ void RenderObject::set_transform(Transform *new_transform) {
     this->transform = new_transform;
 }
 
-Material *RenderObject::get_material() {
+Material &RenderObject::get_material() {
     return this->material;
 }
 

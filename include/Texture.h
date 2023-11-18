@@ -6,7 +6,7 @@
 
 class Texture {
 public:
-    explicit Texture(std::string file_path);
+    explicit Texture(std::string file_path, float repeat = -1.f);
 
     explicit Texture(const std::vector<std::string> &faces);
 
@@ -24,6 +24,8 @@ public:
         return this->height;
     }
 
+    [[nodiscard]] float get_repeat() const;
+
     void destroy();
 
 private:
@@ -32,4 +34,5 @@ private:
     std::string file_path;
     bool is_cube_map = false;
     unsigned char *local_buffer = nullptr;
+    float repeat = 1.f;
 };

@@ -44,7 +44,7 @@ void Scene::play() {
             Renderer::clear_depth();
         }
 
-        this->renderer->render_objects();
+        this->renderer->render_all_objects();
 
         context.swap_buffers();
     }
