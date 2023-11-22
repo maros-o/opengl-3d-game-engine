@@ -1,6 +1,7 @@
 #include "Renderer.h"
 #include "RenderObject.h"
 #include "Texture.h"
+#include <algorithm>
 
 Renderer::Renderer(const std::vector<RenderObject *> &objects) {
     for (auto &object: objects) {
@@ -85,5 +86,36 @@ void Renderer::render_single_object(RenderObject *render_object) const {
         material.get_texture()->bind();
     }
 
+    glStencilFunc(GL_ALWAYS, (int) render_object->get_id(), 0xFF);
+
     this->render();
+}
+
+void Renderer::remove_object(RenderObject *object) {
+    auto model_name = object->get_model()->get_name();
+    auto &group_objs = this->objects[model_name];
+    auto &model = this->models[model_name];
+
+    auto it = std::find(group_objs.begin(), group_objs.end(), object);
+    if (it != group_objs.end()) {
+        group_objs.erase(it);
+    }
+
+    if (group_objs.empty()) {
+        this->objects.erase(model_name);
+        this->models.erase(model_name);
+    }
+}
+
+void Renderer::remove_object_by_id(unsigned int id) {
+    for (auto &model_group: this->objects) {
+        auto &group_objs = model_group.second;
+
+        for (auto object: group_objs) {
+            if (object->get_id() == id) {
+                this->remove_object(object);
+                return;
+            }
+        }
+    }
 }

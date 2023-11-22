@@ -13,7 +13,7 @@ void SpotLight::set_cut_off(float new_cut_off) {
 
 glm::vec3 SpotLight::get_direction() const {
     if (this->camera == nullptr) {
-        return this->transform->get_world_rotation();
+        return this->transform->get_local_rotation();
     }
     auto camera_position = this->camera->get_position();
     auto light_position = this->transform->get_world_position();

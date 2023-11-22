@@ -29,6 +29,10 @@ public:
 
     [[nodiscard]] bool is_key_down(int key) const;
 
+    [[nodiscard]] unsigned short get_mouse_x() const;
+    
+    [[nodiscard]] unsigned short get_mouse_y() const;
+
 private:
     std::unordered_map<int, std::vector<std::function<void()>>> key_press_callbacks;
     std::unordered_map<int, std::vector<std::function<void()>>> key_down_callbacks;

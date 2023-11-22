@@ -65,3 +65,16 @@ void Scene::stop() {
 void Scene::set_sky_box(RenderObject *new_sky_box) {
     this->sky_box = new_sky_box;
 }
+
+void Scene::add_render_object(RenderObject *render_object) {
+    this->renderer->add_object(render_object);
+}
+
+void Scene::add_transform(Transform *transform) {
+    this->transforms.push_back(transform);
+}
+
+void Scene::remove_object_by_id(unsigned int id) {
+    this->renderer->remove_object_by_id(id);
+}
+

@@ -124,3 +124,11 @@ InputManager::register_window_resize_callback(const std::function<void(unsigned 
 InputManager &InputManager::get_instance() {
     return InputManager::instance;
 }
+
+unsigned short InputManager::get_mouse_x() const {
+    return this->mouse_x;
+}
+
+unsigned short InputManager::get_mouse_y() const {
+    return this->mouse_y;
+}

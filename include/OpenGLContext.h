@@ -4,6 +4,8 @@
 #include <GLFW/glfw3.h>
 #include <cstdlib>
 #include <cstdio>
+#include "glm/vec3.hpp"
+#include "Camera.h"
 
 class OpenGLContext {
 public:
@@ -21,11 +23,18 @@ public:
 
     static void print_version_info();
 
+
     [[nodiscard]] int get_screen_width() const;
 
     [[nodiscard]] int get_screen_height() const;
 
     [[nodiscard]] GLFWwindow *get_window() const;
+
+    static GLfloat get_pixel_depth(int mouse_x, int mouse_y);
+
+    static GLuint get_pixel_stencil(int mouse_x, int mouse_y);
+
+    static glm::vec3 get_pixel_world_position(int mouse_x, int mouse_y, Camera *camera);
 
 private:
     GLFWwindow *window;

@@ -14,6 +14,10 @@ public:
 
     void add_object(RenderObject *object);
 
+    void remove_object(RenderObject *object);
+
+    void remove_object_by_id(unsigned int id);
+
     void render_all_objects();
 
     void render_object(RenderObject *object);

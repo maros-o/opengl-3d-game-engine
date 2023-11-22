@@ -18,6 +18,8 @@ public:
 
     void add_object(RenderObject *object);
 
+    void remove_object_by_id(unsigned int id);
+
     void play();
 
     void stop();
@@ -28,6 +30,9 @@ public:
 
     void set_sky_box(RenderObject *sky_box);
 
+    void add_render_object(RenderObject *render_object);
+
+    void add_transform(Transform *transform);
 
 private:
     std::string name;

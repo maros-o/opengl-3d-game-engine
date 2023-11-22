@@ -34,6 +34,7 @@ int main() {
     auto light_2 = new PointLight();
     auto dir_light_1 = new DirectionalLight();
     dir_light_1->set_strength(0.8f);
+    dir_light_1->set_direction(glm::vec3(0.4f, -1.f, 0.f));
 
     auto spot_light_1 = new SpotLight();
     spot_light_1->set_camera(camera);
@@ -88,8 +89,10 @@ int main() {
     auto model_plain = new Model{"model_plain", vao_plain_texture};
     auto model_sky_cube = new Model{"model_sky_cube", vao_sky_cube_texture};
     auto models_tree = ModelLoader::load_models("../res/models/objs/tree/tree.obj");
+    auto models_tree2 = ModelLoader::load_models("../res/models/objs/tree2/tree.obj");
     auto models_zombie = ModelLoader::load_models("../res/models/objs/zombie/zombie.obj");
     auto models_building = ModelLoader::load_models("../res/models/objs/building/building.obj");
+    auto models_teren = ModelLoader::load_models("../res/models/objs/teren.obj");
 
     // materials
     Material material_yellow{glm::vec3(255.f, 255.f, 0.f) / 255.f};
@@ -116,7 +119,7 @@ int main() {
     building->get_transform()->scale(3.f);
     building->get_transform()->set_position(glm::vec3(0.f, 0.f, 50.f));
 
-    for (int i = 0; i < 50; i++) {
+    for (int i = 0; i < 0; i++) {
         auto tree_leaves = new RenderObject{models_tree[1], shader_blinn_texture,
                                             Material{new Texture{"../res/models/objs/tree/leaves.png"}}};
         render_objects.push_back(tree_leaves);
@@ -139,11 +142,22 @@ int main() {
     render_objects.push_back(light_2_render_obj);
     light_2->get_transform()->attach(light_2_render_obj->get_transform());
 
-    auto floor = new RenderObject{model_plain, shader_blinn_texture,
-                                  Material{new Texture{"../res/textures/grass.png", 50}}};
+    auto floor = new RenderObject{models_teren[0], shader_blinn_texture,
+                                  Material{new Texture{"../res/textures/grass.png", 5}}};
     render_objects.push_back(floor);
-    floor->get_transform()->scale(500.f);
+    floor->get_transform()->scale(8.f);
     floor->get_material().set_specular_strength(0.f);
+
+    auto tree_obj = new RenderObject{models_tree2[0],
+                                     shader_blinn_texture,
+                                     Material{new Texture{
+                                             "../res/models/objs/tree2/tree.png"}}};
+    tree_obj->get_transform()->scale(.5f);
+    tree_obj->get_transform()->set_position(glm::vec3(0.f, 0.f, -50.f));
+    tree_obj->get_transform()->set_rotation(glm::vec3(90.f, 0.f, 0.f));
+
+    render_objects.push_back(tree_obj);
+    //camera->get_transform_mount()->attach(tree_obj->get_transform());
 
     auto sky_box = new RenderObject{model_sky_cube, shader_constant_texture,
                                     Material{new Texture{{"../res/textures/skybox/posx.jpg",
@@ -162,7 +176,7 @@ int main() {
     });
     scene->set_on_update([&camera, &sky_box]() {
         auto sky_box_pos = camera->get_position();
-        sky_box_pos.y += 1.f;
+        sky_box_pos.y += 3.f;
         sky_box->get_transform()->set_position(sky_box_pos);
     });
     scene->set_sky_box(sky_box);
@@ -170,6 +184,41 @@ int main() {
 
     // inputs
     {
+        input_manager.register_key_press_callback(GLFW_MOUSE_BUTTON_LEFT,
+                                                  [&input_manager, &camera, &scene, &models_tree2, &shader_blinn_texture]() {
+                                                      int mouse_x = input_manager.get_mouse_x();
+                                                      int mouse_y = input_manager.get_mouse_y();
+
+                                                      GLfloat depth = OpenGLContext::get_pixel_depth(mouse_x, mouse_y);
+                                                      GLuint index = OpenGLContext::get_pixel_stencil(mouse_x, mouse_y);
+
+                                                      printf("Clicked on pixel: (%d, %d), depth: %f, stencil index: %u\n",
+                                                             mouse_x, mouse_y, depth, index);
+
+                                                      glm::vec3 pixel_world_pos = OpenGLContext::get_pixel_world_position(
+                                                              mouse_x,
+                                                              mouse_y,
+                                                              camera);
+
+                                                      auto tree = new RenderObject{models_tree2[0],
+                                                                                   shader_blinn_texture,
+                                                                                   Material{new Texture{
+                                                                                           "../res/models/objs/tree2/tree.png"}}};
+                                                      tree->get_transform()->set_position(pixel_world_pos);
+                                                      tree->get_transform()->scale(.5f);
+                                                      scene->add_object(tree);
+                                                  });
+
+        input_manager.register_key_press_callback(GLFW_MOUSE_BUTTON_RIGHT,
+                                                  [&input_manager, &scene]() {
+                                                      GLuint id = OpenGLContext::get_pixel_stencil(
+                                                              input_manager.get_mouse_x(), input_manager.get_mouse_y());
+
+                                                      printf("Removing object with id: %u\n", id);
+
+                                                      scene->remove_object_by_id(id);
+                                                  });
+
         input_manager.register_key_down_callback(GLFW_KEY_UP, [&light_2]() {
             light_2->move(glm::vec3(0.0f, 0.0f, .1f));
         });

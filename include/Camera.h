@@ -9,7 +9,7 @@
 #include "Transform/TransformComposite.h"
 
 const float FOV = 60.0f;
-const float SPEED = 0.1f;
+const float SPEED = 1.f;
 const float SENSITIVITY = 50.0f;
 const float NEAR = 0.1f;
 const float FAR = 1000.0f;

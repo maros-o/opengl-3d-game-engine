@@ -1,6 +1,7 @@
 #include <map>
 #include "OpenGLContext.h"
 #include <iostream>
+#include <glm/gtc/matrix_transform.hpp>
 
 OpenGLContext OpenGLContext::instance;
 
@@ -149,6 +150,44 @@ OpenGLContext &OpenGLContext::init(int screen_width, int screen_height, const ch
     glDepthFunc(GL_LESS);
     glEnable(GL_DEPTH_TEST);
 
+    glEnable(GL_STENCIL_TEST);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+
     return *this;
+}
+
+GLfloat OpenGLContext::get_pixel_depth(int mouse_x, int mouse_y) {
+    int screen_height = OpenGLContext::get_instance().get_screen_height();
+    int new_y = screen_height - mouse_y;
+
+    GLfloat depth;
+    glReadPixels(mouse_x, new_y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth);
+    return depth;
+}
+
+GLuint OpenGLContext::get_pixel_stencil(int mouse_x, int mouse_y) {
+    int screen_height = OpenGLContext::get_instance().get_screen_height();
+    int new_y = screen_height - mouse_y;
+
+    GLuint index;
+    glReadPixels(mouse_x, new_y, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_INT,
+                 &index);
+    return index;
+}
+
+glm::vec3 OpenGLContext::get_pixel_world_position(int mouse_x, int mouse_y, Camera *camera) {
+    int screen_width = OpenGLContext::get_instance().get_screen_width();
+    int screen_height = OpenGLContext::get_instance().get_screen_height();
+    int new_y = screen_height - mouse_y;
+
+    GLfloat depth = OpenGLContext::get_pixel_depth(mouse_x, mouse_y);
+
+    glm::vec3 screen_pos = glm::vec3(mouse_x, new_y, depth);
+    glm::mat4 view = camera->get_view_matrix();
+    glm::mat4 projection = camera->get_projection_matrix();
+    glm::vec4 view_port = glm::vec4(0, 0, screen_width,
+                                    screen_height);
+    return glm::unProject(screen_pos, view, projection,
+                          view_port);
 }
 
