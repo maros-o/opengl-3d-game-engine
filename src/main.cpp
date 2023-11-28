@@ -22,6 +22,8 @@
 #include "Light/SpotLight.h"
 #include "ModelLoader.h"
 #include "Utils.h"
+#include "motions/LineMotion.h"
+#include "motions/BezierMotion.h"
 
 int main() {
     OpenGLContext &context = OpenGLContext::get_instance().init(1920, 1200, "ZPG - MEC0045");
@@ -96,7 +98,7 @@ int main() {
 
     // materials
     Material material_yellow{glm::vec3(255.f, 255.f, 0.f) / 255.f};
-    Material material_blue{glm::vec3(98.f, 98.f, 255.f) / 255.f};
+    Material material_blue{glm::vec3(20.f, 20.f, 255.f) / 255.f};
     Material material_green{glm::vec3(25.f, 117.f, 25.f) / 255.f};
     Material material_grey{glm::vec3(100.f, 100.f, 100.f) / 255.f};
     Material material_red{glm::vec3(255.f, 25.f, 25.f) / 255.f};
@@ -108,14 +110,14 @@ int main() {
 
     auto zombie = new RenderObject(models_zombie[0], shader_blinn_texture,
                                    Material{new Texture{"../res/models/objs/zombie/zombie.png"}});
-    render_objects.push_back(zombie);
+    //render_objects.push_back(zombie);
     zombie->get_transform()->scale(3.f);
     zombie->get_transform()->set_position(glm::vec3(0.f, 0.f, 10.f));
     zombie->get_transform()->set_rotation(glm::vec3(0.f, 180.f, 0.f));
 
     auto building = new RenderObject(models_building[0], shader_blinn_texture,
                                      Material{new Texture{"../res/models/objs/building/building.png"}});
-    render_objects.push_back(building);
+    //render_objects.push_back(building);
     building->get_transform()->scale(3.f);
     building->get_transform()->set_position(glm::vec3(0.f, 0.f, 50.f));
 
@@ -139,7 +141,7 @@ int main() {
     }
 
     auto light_2_render_obj = new RenderObject{model_sphere, shader_constant, material_yellow};
-    render_objects.push_back(light_2_render_obj);
+    //render_objects.push_back(light_2_render_obj);
     light_2->get_transform()->attach(light_2_render_obj->get_transform());
 
     auto floor = new RenderObject{models_teren[0], shader_blinn_texture,
@@ -148,6 +150,7 @@ int main() {
     floor->get_transform()->scale(8.f);
     floor->get_material().set_specular_strength(0.f);
 
+    /*
     auto tree_obj = new RenderObject{models_tree2[0],
                                      shader_blinn_texture,
                                      Material{new Texture{
@@ -157,7 +160,8 @@ int main() {
     tree_obj->get_transform()->set_rotation(glm::vec3(90.f, 0.f, 0.f));
 
     render_objects.push_back(tree_obj);
-    //camera->get_transform_mount()->attach(tree_obj->get_transform());
+    camera->get_transform_mount()->attach(tree_obj->get_transform());
+    */
 
     auto sky_box = new RenderObject{model_sky_cube, shader_constant_texture,
                                     Material{new Texture{{"../res/textures/skybox/posx.jpg",
@@ -168,13 +172,17 @@ int main() {
                                                           "../res/textures/skybox/negz.jpg"}}}};
     sky_box->get_transform()->scale(10.f);
 
+    std::vector<glm::vec3> bezier_points;
+
+    BezierMotion *bezier_motion = nullptr;
+
     auto scene = new Scene{"forest", render_objects, objectless_transforms};
     scene->set_on_create([&camera, &spot_light_1, &light_2]() {
         camera->set_position(glm::vec3(0.f, 5.f, 0.f));
         spot_light_1->set_position(glm::vec3(0.f, 0.f, -1.f));
         light_2->set_position(glm::vec3(30.f, 20.f, 20.f));
     });
-    scene->set_on_update([&camera, &sky_box]() {
+    scene->add_on_update([&camera, &sky_box]() {
         auto sky_box_pos = camera->get_position();
         sky_box_pos.y += 3.f;
         sky_box->get_transform()->set_position(sky_box_pos);
@@ -184,38 +192,55 @@ int main() {
 
     // inputs
     {
-        input_manager.register_key_press_callback(GLFW_MOUSE_BUTTON_LEFT,
-                                                  [&input_manager, &camera, &scene, &models_tree2, &shader_blinn_texture]() {
+        input_manager.register_key_press_callback(GLFW_MOUSE_BUTTON_RIGHT,
+                                                  [&input_manager, &camera, &scene, &shader_constant, &model_sphere, &material_red, &bezier_points]() {
                                                       int mouse_x = input_manager.get_mouse_x();
                                                       int mouse_y = input_manager.get_mouse_y();
-
                                                       GLfloat depth = OpenGLContext::get_pixel_depth(mouse_x, mouse_y);
                                                       GLuint index = OpenGLContext::get_pixel_stencil(mouse_x, mouse_y);
-
                                                       printf("Clicked on pixel: (%d, %d), depth: %f, stencil index: %u\n",
                                                              mouse_x, mouse_y, depth, index);
-
                                                       glm::vec3 pixel_world_pos = OpenGLContext::get_pixel_world_position(
                                                               mouse_x,
                                                               mouse_y,
                                                               camera);
 
-                                                      auto tree = new RenderObject{models_tree2[0],
-                                                                                   shader_blinn_texture,
-                                                                                   Material{new Texture{
-                                                                                           "../res/models/objs/tree2/tree.png"}}};
-                                                      tree->get_transform()->set_position(pixel_world_pos);
-                                                      tree->get_transform()->scale(.5f);
-                                                      scene->add_object(tree);
+                                                      bezier_points.emplace_back(pixel_world_pos);
+
+                                                      auto point_obj = new RenderObject{model_sphere,
+                                                                                        shader_constant, material_red};
+                                                      point_obj->get_transform()->scale(3.f);
+                                                      point_obj->get_transform()->set_position(pixel_world_pos);
+                                                      scene->add_render_object(point_obj);
                                                   });
 
-        input_manager.register_key_press_callback(GLFW_MOUSE_BUTTON_RIGHT,
+        input_manager.register_key_press_callback(GLFW_KEY_P,
+                                                  [&scene, &bezier_motion, &bezier_points, &model_sphere, &material_blue, &shader_constant]() {
+                                                      if (bezier_points.size() % 4 != 0) {
+                                                          printf("bezier_points.size() % 4 != 0");
+                                                          return;
+                                                      }
+                                                      bezier_motion = new BezierMotion(bezier_points);
+                                                      scene->add_transform(bezier_motion->get_transform_mount());
+
+                                                      auto curve_obj = new RenderObject{model_sphere, shader_constant,
+                                                                                        material_blue};
+                                                      curve_obj->get_transform()->scale(5.f);
+                                                      scene->add_render_object(curve_obj);
+
+                                                      bezier_motion->get_transform_mount()->attach(
+                                                              curve_obj->get_transform());
+
+                                                      scene->add_on_update([&bezier_motion]() {
+                                                          bezier_motion->move();
+                                                      });
+                                                  });
+
+        input_manager.register_key_press_callback(GLFW_KEY_C,
                                                   [&input_manager, &scene]() {
                                                       GLuint id = OpenGLContext::get_pixel_stencil(
                                                               input_manager.get_mouse_x(), input_manager.get_mouse_y());
-
                                                       printf("Removing object with id: %u\n", id);
-
                                                       scene->remove_object_by_id(id);
                                                   });
 

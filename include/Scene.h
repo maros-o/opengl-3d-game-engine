@@ -16,8 +16,6 @@ public:
 
     ~Scene();
 
-    void add_object(RenderObject *object);
-
     void remove_object_by_id(unsigned int id);
 
     void play();
@@ -26,7 +24,7 @@ public:
 
     void set_on_create(std::function<void()> new_on_create);
 
-    void set_on_update(std::function<void()> new_on_update);
+    void add_on_update(std::function<void()> new_on_update);
 
     void set_sky_box(RenderObject *sky_box);
 
@@ -44,5 +42,5 @@ private:
     std::vector<Transform *> transforms;
 
     std::function<void()> on_create = []() {};
-    std::function<void()> on_update = []() {};
+    std::vector<std::function<void()>> on_updates;
 };

@@ -23,6 +23,8 @@ add_executable(main src/main.cpp
         res/models/float_vectors/plain_texture.h
         res/models/float_vectors/sky_cube.h
         include/ModelLoader.h
-        include/Utils.h)
+        include/Utils.h
+        include/motions/LineMotion.h
+        include/motions/BezierMotion.h)
 
 target_link_libraries(main proj_lib glfw GLEW::GLEW -lGL ${ASSIMP_LIBRARIES})
