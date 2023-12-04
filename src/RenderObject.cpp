@@ -1,5 +1,6 @@
 #include "RenderObject.h"
 
+
 unsigned int RenderObject::id_counter = 0;
 
 Model *RenderObject::get_model() {
@@ -8,10 +9,6 @@ Model *RenderObject::get_model() {
 
 Transform *RenderObject::get_transform() {
     return this->transform;
-}
-
-void RenderObject::set_transform(Transform *new_transform) {
-    this->transform = new_transform;
 }
 
 Material &RenderObject::get_material() {

@@ -1,13 +1,13 @@
 #include "OpenGLContext.h"
-#include "Renderer.h"
 #include "Model.h"
+#include "RenderObject.h"
+#include "VAO.h"
 #include "Camera.h"
 #include "Light/PointLight.h"
 #include "Light/DirectionalLight.h"
 #include "InputManager.h"
 #include "Scene.h"
 #include "../include/Transform/TransformComposite.h"
-
 #include "../res/vertices.h"
 #include "../res/indices.h"
 #include "../res/models/float_vectors/plain.h"
@@ -26,7 +26,7 @@
 #include "motions/BezierMotion.h"
 
 int main() {
-    OpenGLContext &context = OpenGLContext::get_instance().init(1920, 1200, "ZPG - MEC0045");
+    OpenGLContext &context = OpenGLContext::get_instance().init(2880, 1800, "ZPG - MEC0045");
 
     InputManager &input_manager = InputManager::get_instance().init();
 
@@ -35,17 +35,18 @@ int main() {
     auto light_1 = new PointLight();
     auto light_2 = new PointLight();
     auto dir_light_1 = new DirectionalLight();
-    dir_light_1->set_strength(0.8f);
-    dir_light_1->set_direction(glm::vec3(0.4f, -1.f, 0.f));
+    dir_light_1->set_strength(0.4f);
+    dir_light_1->set_direction(glm::vec3(0.5f, -1.f, 0.5f));
 
     auto spot_light_1 = new SpotLight();
-    spot_light_1->set_camera(camera);
-    spot_light_1->set_cut_off(0.92f);
+    spot_light_1->get_transform()->set_position(glm::vec3(0.f, 0.f, -1.f));
+    camera->get_transform_mount()->attach(spot_light_1->get_transform());
+    camera->subscribe(spot_light_1);
     spot_light_1->set_constant_strength(1.f);
 
     // shaders
     auto shader_constant = new ShaderProgram{"../shaders/constant_pos.glsl", camera};
-    auto shader_constant_texture = new ShaderProgram{"../shaders/constant_texture_pos.glsl", camera};
+    auto shader_constant_texture = new ShaderProgram{"../shaders/constant_texturecube_pos.glsl", camera};
     auto shader_blinn = new ShaderProgram{"../shaders/blinn_pos_nor.glsl", camera,
                                           {spot_light_1, dir_light_1, light_2}};
     auto shader_blinn_texture = new ShaderProgram{"../shaders/blinn_texture_pos_nor_tep.glsl", camera,
@@ -61,29 +62,14 @@ int main() {
     auto vao_plain_texture = new VAO(VBO{plain_texture, 8});
     auto vao_sky_cube_texture = new VAO(VBO{sky_cube, 3});
     {
-        vao_sphere->link_attributes(0, 3, GL_FLOAT, 6 * sizeof(GLfloat), nullptr);
-        vao_sphere->link_attributes(1, 3, GL_FLOAT, 6 * sizeof(GLfloat), (void *) (3 * sizeof(GLfloat)));
-
-        vao_suzi->link_attributes(0, 3, GL_FLOAT, 6 * sizeof(GLfloat), nullptr);
-        vao_suzi->link_attributes(1, 3, GL_FLOAT, 6 * sizeof(GLfloat), (void *) (3 * sizeof(GLfloat)));
-
-        vao_plain->link_attributes(0, 3, GL_FLOAT, 6 * sizeof(GLfloat), nullptr);
-        vao_plain->link_attributes(1, 3, GL_FLOAT, 6 * sizeof(GLfloat), (void *) (3 * sizeof(GLfloat)));
-
-        vao_bushes->link_attributes(0, 3, GL_FLOAT, 6 * sizeof(GLfloat), nullptr);
-        vao_bushes->link_attributes(1, 3, GL_FLOAT, 6 * sizeof(GLfloat), (void *) (3 * sizeof(GLfloat)));
-
-        vao_tree->link_attributes(0, 3, GL_FLOAT, 6 * sizeof(GLfloat), nullptr);
-        vao_tree->link_attributes(1, 3, GL_FLOAT, 6 * sizeof(GLfloat), (void *) (3 * sizeof(GLfloat)));
-
-        vao_gift->link_attributes(0, 3, GL_FLOAT, 6 * sizeof(GLfloat), nullptr);
-        vao_gift->link_attributes(1, 3, GL_FLOAT, 6 * sizeof(GLfloat), (void *) (3 * sizeof(GLfloat)));
-
-        vao_plain_texture->link_attributes(0, 3, GL_FLOAT, 8 * sizeof(GLfloat), nullptr);
-        vao_plain_texture->link_attributes(1, 3, GL_FLOAT, 8 * sizeof(GLfloat), (void *) (3 * sizeof(GLfloat)));
-        vao_plain_texture->link_attributes(2, 2, GL_FLOAT, 8 * sizeof(GLfloat), (void *) (6 * sizeof(GLfloat)));
-
-        vao_sky_cube_texture->link_attributes(0, 3, GL_FLOAT, 3 * sizeof(GLfloat), nullptr);
+        vao_sphere->link_attributes({3, 3});
+        vao_suzi->link_attributes({3, 3});
+        vao_plain->link_attributes({3, 3});
+        vao_bushes->link_attributes({3, 3});
+        vao_tree->link_attributes({3, 3});
+        vao_gift->link_attributes({3, 3});
+        vao_plain_texture->link_attributes({3, 3, 2});
+        vao_sky_cube_texture->link_attributes({3});
     }
 
     // models
@@ -105,63 +91,43 @@ int main() {
 
     // objects
     auto render_objects = std::vector<RenderObject *>{};
-    auto objectless_transforms = std::vector<Transform *>{};
-    objectless_transforms.push_back(camera->get_transform_mount());
+    auto objectless_transforms = std::vector<Transform *>{camera->get_transform_mount()};
 
     auto zombie = new RenderObject(models_zombie[0], shader_blinn_texture,
                                    Material{new Texture{"../res/models/objs/zombie/zombie.png"}});
-    //render_objects.push_back(zombie);
+    render_objects.push_back(zombie);
     zombie->get_transform()->scale(3.f);
     zombie->get_transform()->set_position(glm::vec3(0.f, 0.f, 10.f));
     zombie->get_transform()->set_rotation(glm::vec3(0.f, 180.f, 0.f));
 
     auto building = new RenderObject(models_building[0], shader_blinn_texture,
                                      Material{new Texture{"../res/models/objs/building/building.png"}});
-    //render_objects.push_back(building);
+    render_objects.push_back(building);
     building->get_transform()->scale(3.f);
     building->get_transform()->set_position(glm::vec3(0.f, 0.f, 50.f));
 
-    for (int i = 0; i < 0; i++) {
-        auto tree_leaves = new RenderObject{models_tree[1], shader_blinn_texture,
-                                            Material{new Texture{"../res/models/objs/tree/leaves.png"}}};
-        render_objects.push_back(tree_leaves);
+    for (int i = 0; i < 20; i++) {
+        auto tree_obj = new RenderObject{models_tree2[0],
+                                         shader_blinn_texture,
+                                         Material{new Texture{
+                                                 "../res/models/objs/tree2/tree.png"}}};
+        render_objects.push_back(tree_obj);
 
-        auto tree_trunk = new RenderObject{models_tree[0], shader_blinn_texture,
-                                           Material{new Texture{"../res/models/objs/tree/trunk.png", 1}}};
-        render_objects.push_back(tree_trunk);
-
-        auto whole_tree = new TransformComposite{};
-        whole_tree->attach(tree_leaves->get_transform());
-        whole_tree->attach(tree_trunk->get_transform());
-        whole_tree->scale(Utils::random_float(3.f, 4.f));
-        whole_tree->set_position(glm::vec3(Utils::random_float(-100.f, 100.f), 0.f, Utils::random_float(-100.f, 20.f)));
-        whole_tree->rotate(glm::vec3(0.f, Utils::random_float(0.f, 360.f), 0.f));
-
-        objectless_transforms.push_back(whole_tree);
+        tree_obj->get_transform()->scale(Utils::random_float(0.3f, 0.7f));
+        tree_obj->get_transform()->set_position(
+                glm::vec3(Utils::random_float(-100.f, 100.f), 0.f, Utils::random_float(-100.f, 20.f)));
+        tree_obj->get_transform()->rotate(glm::vec3(0.f, Utils::random_float(0.f, 360.f), 0.f));
     }
 
     auto light_2_render_obj = new RenderObject{model_sphere, shader_constant, material_yellow};
-    //render_objects.push_back(light_2_render_obj);
+    render_objects.push_back(light_2_render_obj);
     light_2->get_transform()->attach(light_2_render_obj->get_transform());
 
     auto floor = new RenderObject{models_teren[0], shader_blinn_texture,
                                   Material{new Texture{"../res/textures/grass.png", 5}}};
     render_objects.push_back(floor);
     floor->get_transform()->scale(8.f);
-    floor->get_material().set_specular_strength(0.f);
-
-    /*
-    auto tree_obj = new RenderObject{models_tree2[0],
-                                     shader_blinn_texture,
-                                     Material{new Texture{
-                                             "../res/models/objs/tree2/tree.png"}}};
-    tree_obj->get_transform()->scale(.5f);
-    tree_obj->get_transform()->set_position(glm::vec3(0.f, 0.f, -50.f));
-    tree_obj->get_transform()->set_rotation(glm::vec3(90.f, 0.f, 0.f));
-
-    render_objects.push_back(tree_obj);
-    camera->get_transform_mount()->attach(tree_obj->get_transform());
-    */
+    floor->get_material().specular_strength = 0.f;
 
     auto sky_box = new RenderObject{model_sky_cube, shader_constant_texture,
                                     Material{new Texture{{"../res/textures/skybox/posx.jpg",
@@ -171,10 +137,6 @@ int main() {
                                                           "../res/textures/skybox/posz.jpg",
                                                           "../res/textures/skybox/negz.jpg"}}}};
     sky_box->get_transform()->scale(10.f);
-
-    std::vector<glm::vec3> bezier_points;
-
-    BezierMotion *bezier_motion = nullptr;
 
     auto scene = new Scene{"forest", render_objects, objectless_transforms};
     scene->set_on_create([&camera, &spot_light_1, &light_2]() {
@@ -189,6 +151,8 @@ int main() {
     });
     scene->set_sky_box(sky_box);
 
+    std::vector<glm::vec3> bezier_points;
+    BezierMotion *bezier_motion = nullptr;
 
     // inputs
     {

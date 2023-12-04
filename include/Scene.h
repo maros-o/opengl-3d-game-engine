@@ -7,6 +7,7 @@
 #include "InputManager.h"
 #include "Transform/Transform.h"
 
+
 class Scene {
 public:
     Scene(std::string name, const std::vector<RenderObject *> &render_objects);
@@ -19,8 +20,6 @@ public:
     void remove_object_by_id(unsigned int id);
 
     void play();
-
-    void stop();
 
     void set_on_create(std::function<void()> new_on_create);
 
@@ -36,8 +35,6 @@ private:
     std::string name;
     Renderer *renderer;
     RenderObject *sky_box = nullptr;
-
-    bool is_playing = false;
 
     std::vector<Transform *> transforms;
 

@@ -1,7 +1,7 @@
 #include "Renderer.h"
 #include "RenderObject.h"
 #include "Texture.h"
-#include <algorithm>
+
 
 Renderer::Renderer(const std::vector<RenderObject *> &objects) {
     for (auto &object: objects) {
@@ -10,7 +10,7 @@ Renderer::Renderer(const std::vector<RenderObject *> &objects) {
 }
 
 void Renderer::add_object(RenderObject *object) {
-    auto model_name = object->get_model()->get_name();
+    auto model_name = object->get_model()->name;
 
     if (this->objects.find(model_name) == this->objects.end()) {
         this->objects[model_name] = std::vector<RenderObject *>({object});
@@ -43,11 +43,11 @@ void Renderer::clear() {
 void Renderer::render_all_objects() {
     for (auto &model_group: this->objects) {
         auto model = this->models[model_group.first];
-        model->get_vao()->bind();
+        model->vao->bind();
 
-        this->current_vao_has_ebo = model->get_vao()->has_ebo();
-        this->current_draw_count = this->current_vao_has_ebo ? model->get_vao()->get_ebo().value().get_indices_count()
-                                                             : model->get_vao()->get_vbo().get_vertex_count();
+        this->current_vao_has_ebo = model->vao->has_ebo();
+        this->current_draw_count = this->current_vao_has_ebo ? model->vao->get_ebo().value().get_indices_count()
+                                                             : model->vao->get_vbo().get_vertex_count();
 
         for (auto &render_object: model_group.second) {
             this->render_single_object(render_object);
@@ -57,11 +57,11 @@ void Renderer::render_all_objects() {
 
 void Renderer::render_object(RenderObject *render_object) {
     auto model = render_object->get_model();
-    model->get_vao()->bind();
+    model->vao->bind();
 
-    this->current_vao_has_ebo = model->get_vao()->has_ebo();
-    this->current_draw_count = this->current_vao_has_ebo ? model->get_vao()->get_ebo().value().get_indices_count()
-                                                         : model->get_vao()->get_vbo().get_vertex_count();
+    this->current_vao_has_ebo = model->vao->has_ebo();
+    this->current_draw_count = this->current_vao_has_ebo ? model->vao->get_ebo().value().get_indices_count()
+                                                         : model->vao->get_vbo().get_vertex_count();
 
     this->render_single_object(render_object);
 }
@@ -74,16 +74,16 @@ void Renderer::render_single_object(RenderObject *render_object) const {
                         render_object->get_transform()->get_model_matrix());
 
     auto material = render_object->get_material();
-    shader->set_uniform(ShaderUniform::OBJECT_COLOR, material.get_object_color());
-    shader->set_uniform(ShaderUniform::OBJECT_AMBIENT, material.get_ambient_strength());
-    shader->set_uniform(ShaderUniform::OBJECT_DIFFUSE, material.get_diffuse_strength());
-    shader->set_uniform(ShaderUniform::OBJECT_SPECULAR, material.get_specular_strength());
-    shader->set_uniform(ShaderUniform::OBJECT_SHININESS, material.get_shininess());
+    shader->set_uniform(ShaderUniform::OBJECT_COLOR, material.object_color);
+    shader->set_uniform(ShaderUniform::OBJECT_AMBIENT, material.ambient_strength);
+    shader->set_uniform(ShaderUniform::OBJECT_DIFFUSE, material.diffuse_strength);
+    shader->set_uniform(ShaderUniform::OBJECT_SPECULAR, material.specular_strength);
+    shader->set_uniform(ShaderUniform::OBJECT_SHININESS, material.shininess);
 
-    if (material.get_texture() != nullptr) {
+    if (material.texture != nullptr) {
         shader->set_uniform(ShaderUniform::TEXTURE_SAMPLER, 0);
-        shader->set_uniform(ShaderUniform::TEXTURE_REPEAT, material.get_texture()->get_repeat());
-        material.get_texture()->bind();
+        shader->set_uniform(ShaderUniform::TEXTURE_REPEAT, material.texture->get_repeat());
+        material.texture->bind();
     }
 
     glStencilFunc(GL_ALWAYS, (int) render_object->get_id(), 0xFF);
@@ -92,9 +92,8 @@ void Renderer::render_single_object(RenderObject *render_object) const {
 }
 
 void Renderer::remove_object(RenderObject *object) {
-    auto model_name = object->get_model()->get_name();
+    auto model_name = object->get_model()->name;
     auto &group_objs = this->objects[model_name];
-    auto &model = this->models[model_name];
 
     auto it = std::find(group_objs.begin(), group_objs.end(), object);
     if (it != group_objs.end()) {

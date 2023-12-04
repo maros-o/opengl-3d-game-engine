@@ -1,9 +1,10 @@
 #pragma once
 
-#include "buffers/VBO.h"
-#include "buffers/EBO.h"
 #include <iostream>
 #include <optional>
+
+#include "buffers/VBO.h"
+#include "buffers/EBO.h"
 
 class VAO {
 public:
@@ -13,9 +14,7 @@ public:
 
     ~VAO();
 
-    void
-    link_attributes(GLuint layout, GLint num_components, GLenum type, GLsizei stride,
-                    void *offset) const;
+    void link_attributes(const std::vector<GLint> &component_sizes) const;
 
     void bind() const;
 
@@ -35,4 +34,6 @@ private:
     const std::optional<EBO> ebo;
 
     void destroy();
+
+    void attrib_pointer(GLuint layout, GLint num_components, GLsizei stride, void *offset) const;
 };

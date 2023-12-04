@@ -83,24 +83,19 @@ public:
 
             auto vao = has_faces ? new VAO{VBO{vbo_data, vertex_size}, EBO{ebo_data}} : new VAO{
                     VBO{vbo_data, vertex_size}};
-            GLuint layout = 0;
-            size_t stride = 0;
 
-            if (has_positions) {
-                vao->link_attributes(layout++, 3, GL_FLOAT, vertex_size, nullptr);
-                stride += 3 * sizeof(GLfloat);
-            }
-            if (has_normals) {
-                vao->link_attributes(layout++, 3, GL_FLOAT, vertex_size, (void *) (stride));
-                stride += 3 * sizeof(GLfloat);
-            }
-            if (has_texture_coords) {
-                vao->link_attributes(layout++, 2, GL_FLOAT, vertex_size, (void *) (stride));
-                stride += 2 * sizeof(GLfloat);
-            }
-            if (has_tangents) {
-                vao->link_attributes(layout, 3, GL_FLOAT, vertex_size, (void *) (stride));
-            }
+            std::vector<GLint> component_sizes = {};
+
+            if (has_positions)
+                component_sizes.emplace_back(3);
+            if (has_normals)
+                component_sizes.emplace_back(3);
+            if (has_texture_coords)
+                component_sizes.emplace_back(2);
+            if (has_tangents)
+                component_sizes.emplace_back(3);
+
+            vao->link_attributes(component_sizes);
 
             models.push_back(new Model{mesh->mName.C_Str(), vao});
         }

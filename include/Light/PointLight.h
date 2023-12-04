@@ -1,16 +1,14 @@
 #pragma once
 
+#include "glm/glm.hpp"
 #include "Observer/Observer.h"
 #include "Observer/Observable.h"
-#include "glm/glm.hpp"
 #include "Light.h"
 #include "Transform/Transform.h"
-#include "Transform/TransformLeaf.h"
-#include "Camera.h"
+#include "Transform/TransformComposite.h"
 
-class RenderObject;
 
-class PointLight : public Light, Observer {
+class PointLight : public Light, public Observer {
 public:
     PointLight() = default;
 
@@ -25,8 +23,6 @@ public:
     void set_linear_strength(float new_linear_strength);
 
     void set_quadratic_strength(float new_quadratic_strength);
-
-    void set_camera(Camera *new_camera);
 
     [[nodiscard]]  glm::vec3 get_position() const;
 
@@ -47,7 +43,6 @@ protected:
     glm::vec3 color{glm::vec3(1.0f, 1.0f, 1.0f)};
 
     TransformComposite *transform = new TransformComposite();
-    Camera *camera = nullptr;
 
     float constant_strength = 1.0f;
     float linear_strength = 0.008f;

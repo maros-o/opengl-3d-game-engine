@@ -1,9 +1,9 @@
-#include "Texture.h"
-
 #include <../libs/stb/stb_image.h>
 
-Texture::Texture(std::string file_path, float new_repeat) : file_path(std::move(file_path)) {
+#include "Texture.h"
 
+
+Texture::Texture(std::string file_path, float new_repeat) : file_path(std::move(file_path)) {
     stbi_set_flip_vertically_on_load(1);
     this->local_buffer = stbi_load(this->file_path.c_str(), &this->width, &this->height, &this->channels, 4);
     if (!this->local_buffer) {

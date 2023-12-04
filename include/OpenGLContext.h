@@ -5,7 +5,9 @@
 #include <cstdlib>
 #include <cstdio>
 #include "glm/vec3.hpp"
+
 #include "Camera.h"
+
 
 class OpenGLContext {
 public:
@@ -22,7 +24,6 @@ public:
     static void set_viewport(unsigned short screen_width, unsigned short screen_height);
 
     static void print_version_info();
-
 
     [[nodiscard]] int get_screen_width() const;
 

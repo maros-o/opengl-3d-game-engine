@@ -1,6 +1,7 @@
 #include "Light/PointLight.h"
 #include "RenderObject.h"
 
+
 void PointLight::move(const glm::vec3 &offset) {
     this->transform->translate(offset);
     this->notify((int) LightEvent::ALL);
@@ -67,16 +68,6 @@ void PointLight::update(int event) {
     }
 
     this->notify((int) LightEvent::ALL);
-}
-
-void PointLight::set_camera(Camera *new_camera) {
-    if (this->camera != nullptr) {
-        this->camera->unsubscribe(this);
-    }
-
-    this->camera = new_camera;
-    this->camera->subscribe(this);
-    this->camera->get_transform_mount()->attach(this->transform);
 }
 
 TransformComposite *PointLight::get_transform() const {

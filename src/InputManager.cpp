@@ -1,6 +1,7 @@
 #include "InputManager.h"
 #include "OpenGLContext.h"
 
+
 InputManager InputManager::instance;
 
 InputManager &InputManager::init() {

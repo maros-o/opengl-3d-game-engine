@@ -1,7 +1,9 @@
 #include <map>
-#include "OpenGLContext.h"
 #include <iostream>
 #include <glm/gtc/matrix_transform.hpp>
+
+#include "OpenGLContext.h"
+
 
 OpenGLContext OpenGLContext::instance;
 

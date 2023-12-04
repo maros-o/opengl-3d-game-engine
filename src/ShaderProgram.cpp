@@ -1,12 +1,11 @@
+#include <fstream>
+#include <string>
+#include <sstream>
+
 #include "ShaderProgram.h"
 #include "buffers/SSBO.h"
 #include "Light/DirectionalLight.h"
 #include "Light/SpotLight.h"
-#include <fstream>
-#include <iostream>
-#include <string>
-#include <sstream>
-#include <utility>
 
 static std::unordered_map<ShaderUniform, std::string> ShaderUniformToString = {
         {ShaderUniform::MODEL_MATRIX,          "u_model_matrix"},

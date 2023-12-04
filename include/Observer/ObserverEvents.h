@@ -1,3 +1,4 @@
+
 enum class CameraEvent : int {
     PROJECTION = 0,
     VIEW = 1,

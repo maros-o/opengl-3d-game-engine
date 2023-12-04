@@ -1,6 +1,8 @@
+#include <cstdio>
+
 #include "Transform/TransformLeaf.h"
 #include "Transform/TransformComposite.h"
-#include <stdexcept>
+
 
 Transform *TransformLeaf::attach(Transform *child) {
     Transform *composite = new TransformComposite();
@@ -20,7 +22,8 @@ Transform *TransformLeaf::attach(Transform *child) {
 }
 
 Transform *TransformLeaf::detach(Transform *child) {
-    throw std::runtime_error("TransformLeaf::detach: cannot detach from leaf");
+    fprintf(stderr, "ERROR::TransformLeaf::detach\n");
+    exit(EXIT_FAILURE);
 }
 
 void TransformLeaf::update_parent_model_matrix() {

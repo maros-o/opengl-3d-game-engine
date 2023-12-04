@@ -4,7 +4,6 @@
 #include "Light.h"
 #include "PointLight.h"
 
-class RenderObject;
 
 class SpotLight : public PointLight {
 public:
@@ -19,7 +18,7 @@ public:
     [[nodiscard]]  float get_cut_off() const;
 
 private:
-    float cut_off = 1.f;
+    float cut_off = 0.92f;
 };
 
 

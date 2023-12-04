@@ -3,6 +3,8 @@
 #include <functional>
 
 #include "Model.h"
+#include "Material.h"
+#include "ShaderProgram.h"
 #include "./Transform/Transform.h"
 #include "./Transform/TransformLeaf.h"
 
@@ -22,8 +24,6 @@ public:
     ShaderProgram *get_shader();
 
     [[nodiscard]] unsigned int get_id() const;
-
-    void set_transform(Transform *new_transform);
 
 private:
     static unsigned int id_counter;

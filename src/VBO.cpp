@@ -1,5 +1,6 @@
 #include "buffers/VBO.h"
 
+
 VBO::VBO(const std::vector<GLfloat> &vertices, GLsizei values_per_vertex) {
     this->vertex_count = static_cast<GLsizei>(vertices.size()) / values_per_vertex;
 

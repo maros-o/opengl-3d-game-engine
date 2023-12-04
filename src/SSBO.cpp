@@ -1,5 +1,6 @@
 #include "./buffers/SSBO.h"
 
+
 SSBO::SSBO(GLsizei binding_point) : binding_point(binding_point) {
     glGenBuffers(1, &this->id);
 }

@@ -1,6 +1,6 @@
-
 #include "Light/DirectionalLight.h"
 #include "Observer/ObserverEvents.h"
+
 
 void DirectionalLight::set_direction(const glm::vec3 &new_direction) {
     this->direction = new_direction;

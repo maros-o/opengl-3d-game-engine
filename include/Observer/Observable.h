@@ -4,6 +4,7 @@
 #include "vector"
 #include "Observer.h"
 
+
 class Observable {
 public:
     virtual void subscribe(Observer *observer) {

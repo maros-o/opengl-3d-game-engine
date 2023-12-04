@@ -7,6 +7,7 @@
 
 #include "OpenGLContext.h"
 
+
 class InputManager {
 public:
     static InputManager &get_instance();
@@ -30,7 +31,7 @@ public:
     [[nodiscard]] bool is_key_down(int key) const;
 
     [[nodiscard]] unsigned short get_mouse_x() const;
-    
+
     [[nodiscard]] unsigned short get_mouse_y() const;
 
 private:

@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+
 #include "OpenGLContext.h"
 
 class Texture {

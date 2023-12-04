@@ -1,5 +1,6 @@
 #include "buffers/EBO.h"
 
+
 EBO::EBO(const std::vector<GLuint> &indices) {
     this->indices_count = static_cast<GLsizei>(indices.size());
 

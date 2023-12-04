@@ -1,10 +1,5 @@
-
 #include "Camera.h"
-#include "glm/detail/type_quat.hpp"
 #include "glm/gtc/quaternion.hpp"
-#include <algorithm>
-#include <glm/gtc/matrix_transform.hpp>
-#include <iostream>
 
 
 Camera::Camera(int width, int height) : width(width), height(height) {}
@@ -113,7 +108,7 @@ TransformComposite *Camera::get_transform_mount() const {
 
 glm::vec3 Camera::get_euler_angles() const {
     auto matrix = glm::mat3(this->get_view_matrix());
-    
+
     glm::quat quat_cast = glm::quat_cast(matrix);
     glm::vec3 euler_angles = glm::eulerAngles(quat_cast);
     return euler_angles;

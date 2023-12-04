@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+
 #include "Transform.h"
 
 
@@ -16,5 +17,4 @@ public:
 
 private:
     std::vector<Transform *> children;
-
 };

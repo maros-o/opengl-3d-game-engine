@@ -1,7 +1,6 @@
 #include "Transform/Transform.h"
 #include "glm/gtc/quaternion.hpp"
 
-#include <glm/gtc/matrix_transform.hpp>
 
 Transform *Transform::scale(float scale) {
     return this->apply_transformation([scale](Transform &render_object) {
@@ -84,11 +83,6 @@ Transform *Transform::apply_transformation(const std::function<void(Transform &)
     return this;
 }
 
-Transform *Transform::set_scale(float new_scale) {
-    this->local_measure = glm::vec3(new_scale, new_scale, new_scale);
-    return this;
-}
-
 glm::vec3 Transform::get_local_position() const {
     return this->local_position;
 }
@@ -97,44 +91,11 @@ glm::vec3 Transform::get_local_rotation() const {
     return this->local_rotation;
 }
 
-glm::vec3 Transform::get_local_scale() const {
-    return this->local_measure;
-}
-
 glm::vec3 Transform::get_world_position() {
     auto model_matrix = this->get_model_matrix();
     return {model_matrix[3][0], model_matrix[3][1], model_matrix[3][2]};
 }
 
-glm::vec3 Transform::get_world_scale() {
-    auto model_matrix = this->get_model_matrix();
-    auto scale_matrix = glm::mat3(model_matrix);
-    return {glm::length(scale_matrix[0]), glm::length(scale_matrix[1]), glm::length(scale_matrix[2])};
-}
-
-glm::vec3 Transform::get_world_rotation() {
-    // @TODO: fix
-    
-    auto matrix = glm::mat3(this->get_model_matrix());
-    glm::quat quat_cast = glm::quat_cast(matrix);
-    glm::vec3 euler_angles = glm::eulerAngles(quat_cast);
-    return glm::degrees(euler_angles);
-}
-
-void Transform::set_parent_matrix(glm::mat4 new_parent_model_matrix) {
-    this->parent_model_matrix = new_parent_model_matrix;
-}
-
-Transform *Transform::set_rotation_x(float new_rotation_x) {
-    return this->apply_transformation([new_rotation_x](Transform &render_object) {
-        render_object.local_rotation.x = new_rotation_x;
-        render_object.clamp_rotation();
-    });
-}
-
-Transform *Transform::set_rotation_y(float new_rotation_y) {
-    return this->apply_transformation([new_rotation_y](Transform &render_object) {
-        render_object.local_rotation.y = new_rotation_y;
-        render_object.clamp_rotation();
-    });
+Transform *Transform::get_parent() const {
+    return this->parent;
 }

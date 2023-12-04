@@ -1,5 +1,6 @@
 #include "Light/SpotLight.h"
-#include <iostream>
+#include "Observer/ObserverEvents.h"
+
 
 void SpotLight::set_direction(const glm::vec3 &new_direction) {
     this->transform->set_rotation(new_direction);
@@ -12,13 +13,10 @@ void SpotLight::set_cut_off(float new_cut_off) {
 }
 
 glm::vec3 SpotLight::get_direction() const {
-    if (this->camera == nullptr) {
+    if (this->transform->get_parent() == nullptr) {
         return this->transform->get_local_rotation();
     }
-    auto camera_position = this->camera->get_position();
-    auto light_position = this->transform->get_world_position();
-
-    return glm::normalize(camera_position - light_position);
+    return glm::normalize(this->transform->get_parent()->get_world_position() - this->transform->get_world_position());
 }
 
 float SpotLight::get_cut_off() const {
